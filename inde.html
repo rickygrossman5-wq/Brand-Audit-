@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPC Account Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+:root{
+  --bg:#1a1a1a;
+  --s1:#1f1f1f;
+  --s2:#262626;
+  --s3:#2e2e2e;
+  --b1:rgba(255,255,255,0.07);
+  --b2:rgba(255,255,255,0.12);
+  --text:#ececec;
+  --sub:#aaa;
+  --dim:#666;
+  --acc:#cf7c3a;
+  --acc-hi:#e8913f;
+  --red:#e05252;
+  --amber:#d4a443;
+  --green:#4caf82;
+  --blue:#5a8fd4;
+  --body:'DM Sans',system-ui,-apple-system,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:14px;scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--b1);background:var(--s1);position:sticky;top:0;z-index:50;}
+.hdr-brand{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-0.01em;}
+.hdr-brand span{color:var(--acc);}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.pill{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;background:var(--s3);color:var(--sub);border:1px solid var(--b1);}
+
+/* LAYOUT */
+.wrap{max-width:1280px;margin:0 auto;padding:28px 24px;}
+
+/* UPLOAD */
+.upload-zone{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:24px;margin-bottom:20px;}
+.upload-zone-title{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text);}
+.upload-zone-sub{font-size:12px;color:var(--sub);margin-bottom:20px;}
+.upload-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:20px;}
+.upload-card{position:relative;border:1px solid var(--b1);border-radius:8px;padding:16px;background:var(--s2);cursor:pointer;transition:border-color 0.15s;}
+.upload-card:hover{border-color:var(--b2);}
+.upload-card.loaded{border-color:rgba(76,175,130,0.4);background:rgba(76,175,130,0.05);}
+.upload-card input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.uc-icon{font-size:18px;margin-bottom:8px;}
+.uc-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.uc-desc{font-size:11px;color:var(--dim);}
+.uc-status{font-size:11px;margin-top:8px;}
+.uc-status.ok{color:var(--green);}
+.uc-status.wait{color:var(--dim);}
+
+/* CONFIG */
+.config-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+.config-field{display:flex;flex-direction:column;gap:5px;}
+.config-field label{font-size:11px;font-weight:500;color:var(--sub);letter-spacing:0.01em;}
+.config-field input,.config-field textarea{
+  background:var(--s2);border:1px solid var(--b2);color:var(--text);
+  font-family:var(--body);font-size:13px;padding:7px 11px;border-radius:7px;outline:none;
+  transition:border-color 0.15s;
+}
+.config-field input{width:200px;}
+.config-field textarea{width:340px;height:64px;resize:vertical;font-size:12px;}
+.config-field input:focus,.config-field textarea:focus{border-color:var(--acc);}
+
+.btn{
+  font-family:var(--body);font-size:13px;font-weight:600;
+  padding:8px 20px;border-radius:8px;cursor:pointer;border:none;
+  transition:all 0.15s;letter-spacing:-0.01em;
+}
+.btn-primary{background:var(--acc);color:#fff;}
+.btn-primary:hover{background:var(--acc-hi);}
+.btn-ghost{background:var(--s3);color:var(--sub);border:1px solid var(--b1);}
+.btn-ghost:hover{color:var(--text);border-color:var(--b2);}
+.btn-xs{font-size:11px;padding:3px 9px;border-radius:5px;}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px;}
+.metric{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:16px 18px;}
+.metric-label{font-size:11px;color:var(--sub);margin-bottom:8px;font-weight:500;}
+.metric-val{font-size:22px;font-weight:600;line-height:1;letter-spacing:-0.02em;}
+.metric-val.ok{color:var(--green);}
+.metric-val.warn{color:var(--amber);}
+.metric-val.bad{color:var(--red);}
+.metric-val.neutral{color:var(--text);}
+.metric-hint{font-size:11px;color:var(--dim);margin-top:5px;}
+.metric-target{font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:5px;}
+.mt-ok{background:rgba(76,175,130,0.12);color:var(--green);}
+.mt-warn{background:rgba(212,164,67,0.12);color:var(--amber);}
+.mt-bad{background:rgba(224,82,82,0.12);color:var(--red);}
+
+/* SPEND BAR */
+.spend-card{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:18px 20px;margin-bottom:20px;}
+.spend-bar{height:22px;border-radius:6px;overflow:hidden;display:flex;margin:12px 0 10px;background:var(--s3);}
+.spend-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;transition:width 0.4s ease;white-space:nowrap;overflow:hidden;padding:0 6px;}
+.seg-b{background:var(--red);}
+.seg-nb{background:var(--green);}
+.seg-auto{background:var(--blue);}
+.spend-leg{display:flex;gap:18px;font-size:12px;color:var(--sub);}
+.leg-item{display:flex;align-items:center;gap:6px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.spend-header{display:flex;justify-content:space-between;align-items:center;}
+.spend-title{font-size:13px;font-weight:600;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--s2);border-radius:8px;padding:3px;border:1px solid var(--b1);width:fit-content;}
+.tab{font-size:12px;font-weight:500;padding:6px 16px;cursor:pointer;border-radius:6px;color:var(--sub);background:none;border:none;transition:all 0.15s;font-family:var(--body);}
+.tab.active{background:var(--s1);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+.tab:hover:not(.active){color:var(--text);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* SECTION LABEL */
+.sec-label{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.card-head-title{font-size:13px;font-weight:600;}
+.card-body{padding:16px 18px;}
+
+/* VIOLATIONS */
+.viol-list{display:flex;flex-direction:column;gap:8px;}
+.viol{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;gap:12px;}
+.viol.critical{border-left:3px solid var(--red);}
+.viol.warning{border-left:3px solid var(--amber);}
+.viol-ico{font-size:15px;flex-shrink:0;padding-top:1px;}
+.viol-text .viol-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+.viol-text .viol-detail{font-size:12px;color:var(--sub);line-height:1.6;}
+.viol-text .viol-action{font-size:11px;color:var(--acc);margin-top:6px;font-weight:500;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;font-weight:600;color:var(--sub);padding:9px 14px;text-align:left;background:var(--s2);border-bottom:1px solid var(--b1);white-space:nowrap;letter-spacing:0.02em;}
+td{padding:10px 14px;border-bottom:1px solid var(--b1);font-size:12px;color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.td-name{font-family:var(--mono);font-size:11px;max-width:380px;}
+.td-r{text-align:right;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.02em;}
+.badge-red{background:rgba(224,82,82,0.12);color:var(--red);}
+.badge-amber{background:rgba(212,164,67,0.12);color:var(--amber);}
+.badge-green{background:rgba(76,175,130,0.12);color:var(--green);}
+.badge-blue{background:rgba(90,143,212,0.12);color:var(--blue);}
+.badge-acc{background:rgba(207,124,58,0.12);color:var(--acc);}
+.badge-neutral{background:var(--s3);color:var(--sub);}
+
+/* KEYWORDS */
+.kw-section{margin-bottom:28px;}
+.kw-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.kw-section-title{font-size:13px;font-weight:600;}
+.kw-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:800px){.kw-two{grid-template-columns:1fr;}}
+.kw-table-head{display:flex;padding:7px 14px;background:var(--s2);border-bottom:1px solid var(--b1);font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.05em;}
+.kw-row{display:flex;padding:8px 14px;border-bottom:1px solid var(--b1);align-items:center;gap:8px;font-size:12px;}
+.kw-row:last-child{border-bottom:none;}
+.kw-row:hover{background:rgba(255,255,255,0.02);}
+.kw-kw{flex:1;color:var(--text);}
+.kw-vol{width:72px;text-align:right;color:var(--sub);font-family:var(--mono);font-size:11px;}
+.kw-share{width:58px;text-align:center;}
+.kw-match{width:90px;font-size:10px;color:var(--dim);}
+.share-zero{font-size:10px;font-weight:600;color:var(--red);}
+.share-low{font-size:10px;font-weight:600;color:var(--amber);}
+.share-ok{font-size:10px;font-weight:600;color:var(--green);}
+
+/* COMPETITORS */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+@media(max-width:900px){.comp-grid{grid-template-columns:1fr;}}
+.comp-brands{display:flex;flex-wrap:wrap;gap:6px;padding:14px 16px;}
+.comp-brand{font-size:11px;padding:4px 10px;background:var(--s3);border:1px solid var(--b1);border-radius:5px;cursor:pointer;transition:all 0.1s;}
+.comp-brand:hover{border-color:var(--b2);color:var(--acc);}
+.comp-note{font-size:11px;color:var(--sub);padding:10px 16px;border-top:1px solid var(--b1);line-height:1.6;}
+
+/* PLAN */
+.phase{margin-bottom:28px;}
+.phase-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;}
+.phase-n{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:0.08em;}
+.phase-title{font-size:15px;font-weight:600;letter-spacing:-0.01em;}
+.phase-range{font-size:11px;color:var(--dim);}
+.actions{display:flex;flex-direction:column;gap:6px;}
+.action{display:flex;gap:10px;padding:10px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;align-items:flex-start;}
+.action-pri{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;text-transform:uppercase;letter-spacing:0.04em;}
+.p1{background:rgba(224,82,82,0.12);color:var(--red);}
+.p2{background:rgba(212,164,67,0.12);color:var(--amber);}
+.p3{background:rgba(90,143,212,0.12);color:var(--blue);}
+.action-text{flex:1;font-size:12px;line-height:1.5;}
+.action-impact{font-size:11px;color:var(--acc);flex-shrink:0;font-weight:500;}
+
+/* UTILITY */
+.empty{padding:40px;text-align:center;color:var(--dim);font-size:12px;}
+.copy-btn{font-size:10px;padding:3px 9px;background:var(--s3);border:1px solid var(--b1);color:var(--sub);cursor:pointer;border-radius:5px;font-family:var(--body);transition:all 0.1s;}
+.copy-btn:hover{color:var(--text);border-color:var(--b2);}
+.info-bar{background:rgba(207,124,58,0.08);border:1px solid rgba(207,124,58,0.2);border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:20px;}
+.info-bar b{color:var(--acc);}
+.divider{height:1px;background:var(--b1);margin:20px 0;}
+#dashboard{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">PLTFRM <span>PPC Audit</span></div>
+  <div class="hdr-right">
+    <div class="pill" id="auditDate"></div>
+    <div class="pill">Sponsored Products</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- UPLOAD -->
+  <div id="uploadSection">
+    <div class="upload-zone">
+      <div class="upload-zone-title">Upload Reports</div>
+      <div class="upload-zone-sub">Upload any combination — audit will use available data and fall back to analyzed values where files are missing.</div>
+      <div class="upload-grid">
+        <label class="upload-card" id="card-campaign">
+          <input type="file" accept=".csv,.xlsx" onchange="handleFile(event,'campaign')">
+          <div class="uc-icon">📊</div>
+          <div class="uc-name">Campaign Report</div>
+          <div class="uc-desc">Spend, ACOS, ROAS by campaign</div>
+          <div class="uc-status wait" id="status-campaign">Click to upload</div>
+        </label>
+        <label class="upload-card" id="card-bulk">
+          <input type="file" accept=".csv,.xlsx" onchange="handleFile(event,'bulk')">
+          <div class="uc-icon">📋</div>
+          <div class="uc-name">Bulk Sheet Export</div>
+          <div class="uc-desc">Campaign states, bids, targeting</div>
+          <div class="uc-status wait" id="status-bulk">Click to upload</div>
+        </label>
+        <label class="upload-card" id="card-sqp">
+          <input type="file" accept=".csv,.xlsx" onchange="handleFile(event,'sqp')">
+          <div class="uc-icon">🔍</div>
+          <div class="uc-name">SQP Brand View</div>
+          <div class="uc-desc">Search query purchase share data</div>
+          <div class="uc-status wait" id="status-sqp">Click to upload</div>
+        </label>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;padding-top:4px;">
+        <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
+          <div class="config-field">
+            <label>Brand name</label>
+            <input type="text" id="brandName" placeholder="e.g. HoldOn" style="width:200px;" />
+            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Detects branded campaigns automatically.</div>
+          </div>
+          <div class="config-field">
+            <label>Product lines <span style="font-weight:400;color:var(--dim)">(one per line)</span></label>
+            <textarea id="productLines" placeholder="Trash Bags&#10;Zip Bags&#10;Dog Poop Bags" style="width:260px;height:78px;"></textarea>
+          </div>
+          <div class="config-field">
+            <label>ASINs for keyword generation <span style="font-weight:400;color:var(--dim)">(optional, one per line)</span></label>
+            <textarea id="asinList" placeholder="B0BLJ41Y82&#10;B0CVH42486&#10;B0D4FF1JHL" style="width:260px;height:78px;"></textarea>
+            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Claude will identify each product and generate tailored keywords.</div>
+          </div>
+          <div class="config-field">
+            <label>Anthropic API key <span style="font-weight:400;color:var(--dim)">(for ASIN keywords)</span></label>
+            <input type="password" id="apiKey" placeholder="sk-ant-..." style="width:220px;" />
+            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Used client-side only. Never stored or sent anywhere else.</div>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="runAudit()" id="runBtn">Run Audit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+
+    <div class="metrics" id="metricsStrip"></div>
+
+    <!-- SPEND SPLIT -->
+    <div class="spend-card">
+      <div class="spend-header">
+        <div class="spend-title">Spend Distribution</div>
+        <div style="font-size:11px;color:var(--dim);" id="spendTargetNote"></div>
+      </div>
+      <div class="spend-bar" id="spendBar"></div>
+      <div class="spend-leg" id="spendLeg"></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('violations',this)">Violations</button>
+      <button class="tab" onclick="showTab('campaigns',this)">Active Campaigns</button>
+      <button class="tab" onclick="showTab('keywords',this)">Keywords</button>
+      <button class="tab" onclick="showTab('competitors',this)">Competitors</button>
+      <button class="tab" onclick="showTab('plan',this)">30/60/90 Plan</button>
+    </div>
+
+    <div id="tab-violations" class="tab-panel active"></div>
+    <div id="tab-campaigns" class="tab-panel"></div>
+    <div id="tab-keywords" class="tab-panel"></div>
+    <div id="tab-competitors" class="tab-panel"></div>
+    <div id="tab-plan" class="tab-panel"></div>
+
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const state = { campaignData:null, bulkData:null, sqpData:null };
+
+// ─── KEYWORD TARGETS (from SQP March 2026 analysis) ──────────────────────────
+const KW_TARGETS = {
+  'Trash / Kitchen / Compost Bags':{
+    t1:[
+      {kw:'trash bags',vol:566790,share:0.01,match:'Phrase → Exact'},
+      {kw:'garbage bags',vol:287040,share:0.01,match:'Phrase → Exact'},
+      {kw:'trash bags 13 gallon',vol:201620,share:0.00,match:'Phrase → Exact'},
+      {kw:'small trash bags',vol:200374,share:0.00,match:'Phrase → Exact'},
+      {kw:'13 gallon trash bags',vol:134171,share:0.01,match:'Phrase → Exact'},
+      {kw:'kitchen trash bags',vol:96653,share:0.02,match:'Phrase → Exact'},
+      {kw:'garbage bags 13 gallon tall kitchen',vol:76897,share:0.02,match:'Exact'},
+      {kw:'4 gallon trash bag',vol:71316,share:0.03,match:'Phrase → Exact'},
+      {kw:'bathroom trash bags',vol:53345,share:0.01,match:'Phrase'},
+      {kw:'tall kitchen trash bags',vol:44542,share:0.00,match:'Phrase → Exact'},
+      {kw:'compost bags',vol:38353,share:0.13,match:'Phrase → Exact'},
+      {kw:'heavy duty trash bags',vol:33727,share:0.00,match:'Broad → Phrase'},
+    ],
+    t2:[
+      {kw:'compostable trash bags',vol:18753,share:0.59,match:'Phrase → Exact'},
+      {kw:'biodegradable trash bags',vol:11661,share:0.36,match:'Phrase → Exact'},
+      {kw:'eco friendly trash bags',vol:1154,share:1.22,match:'Exact'},
+      {kw:'compostable garbage bags',vol:1019,share:1.67,match:'Exact'},
+      {kw:'green trash bags',vol:1395,share:0.66,match:'Exact'},
+      {kw:'compostable trash bags 13 gallon',vol:1487,share:0.00,match:'Exact'},
+      {kw:'biodegradable trash bags 13 gallon',vol:896,share:1.20,match:'Exact'},
+    ]
+  },
+  'Zip / Sandwich / Snack Bags':{
+    t1:[
+      {kw:'ziploc bags',vol:196571,share:0.00,match:'Phrase → Exact'},
+      {kw:'sandwich bags',vol:146850,share:0.03,match:'Phrase → Exact'},
+      {kw:'storage bags',vol:111947,share:0.02,match:'Phrase'},
+      {kw:'gallon ziploc bags',vol:104963,share:0.01,match:'Phrase → Exact'},
+      {kw:'freezer bags',vol:91536,share:0.02,match:'Phrase → Exact'},
+      {kw:'snack bags',vol:69253,share:0.00,match:'Phrase → Exact'},
+      {kw:'gallon freezer bags',vol:43483,share:0.04,match:'Phrase → Exact'},
+      {kw:'ziploc sandwich bags',vol:41164,share:0.00,match:'Exact'},
+      {kw:'ziploc freezer bags gallon size',vol:38936,share:0.00,match:'Exact'},
+      {kw:'sandwich bags ziplock',vol:34060,share:0.00,match:'Exact'},
+      {kw:'snack bag',vol:29057,share:0.12,match:'Phrase → Exact'},
+      {kw:'zip lock bags',vol:17595,share:0.05,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'compostable ziploc bags',vol:8734,share:0.60,match:'Exact'},
+      {kw:'compostable sandwich bags',vol:2776,share:0.71,match:'Exact'},
+      {kw:'compostable snack bags',vol:1153,share:0.00,match:'Exact'},
+      {kw:'biodegradable sandwich bags',vol:864,share:0.00,match:'Exact'},
+      {kw:'plastic free freezer bags',vol:526,share:0.00,match:'Exact'},
+    ]
+  },
+  'Dog Poop Bags':{
+    t1:[
+      {kw:'dog poop bags rolls',vol:217418,share:0.00,match:'Phrase → Exact'},
+      {kw:'poop bags for dogs',vol:151967,share:0.00,match:'Phrase → Exact'},
+      {kw:'poop bags',vol:100058,share:0.00,match:'Phrase'},
+      {kw:'dog poop bags',vol:81120,share:0.00,match:'Phrase → Exact'},
+      {kw:'dog bags',vol:45290,share:0.01,match:'Phrase'},
+    ],
+    t2:[
+      {kw:'compostable dog poop bags',vol:5882,share:0.00,match:'Exact'},
+      {kw:'dog poop bags rolls biodegradable',vol:3697,share:0.15,match:'Exact'},
+      {kw:'biodegradable poop bags',vol:2000,share:0.00,match:'Exact'},
+      {kw:'eco friendly poop bags for dogs',vol:500,share:0.00,match:'Exact'},
+    ]
+  }
+};
+
+const COMPETITORS = {
+  'Trash / Kitchen / Compost Bags':{
+    brands:['BioBag','Unni','Hippo Sak','Reli','Superbio','Glad','Hefty','Ayotee','Cleanomic','Ecosafe','Simplehuman','Bag to Nature','Grefusion','Forid','Aneco'],
+    note:'Focus PAT on BioBag, Unni, Superbio — compost-adjacent competitors aligned to HoldOn positioning. Pull ASINs via Helium 10, sort by BSR within Disposable Compost Bags subcategory.'
+  },
+  'Zip / Sandwich / Snack Bags':{
+    brands:['Ziploc','Cleanomics','If You Care','Repurpose','Stasher'],
+    note:"Ziploc dominates volume — target their sandwich and snack bag ASINs. Stasher attracts eco shoppers and is well-matched to HoldOn's angle."
+  },
+  'Dog Poop Bags':{
+    brands:['Earth Rated','AmazonBasics','Bags on Board',"Pogi's",'Frisco','Mutt Mitt'],
+    note:"Earth Rated leads the category. Pull their standard/lavender variants and run Expanded PAT with HoldOn eco messaging. Strong CVR on eco-motivated dog owners."
+  }
+};
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+function handleFile(e,type){
+  const file=e.target.files[0];if(!file)return;
+  const card=document.getElementById(`card-${type}`);
+  const status=document.getElementById(`status-${type}`);
+  status.className='uc-status wait';status.textContent='Parsing…';
+  if(file.name.endsWith('.csv')){
+    Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{
+      state[`${type}Data`]=r.data;
+      card.classList.add('loaded');status.className='uc-status ok';
+      status.textContent=`✓ ${file.name} — ${r.data.length} rows`;
+    }});
+  } else {
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const sheets={};
+      wb.SheetNames.forEach(n=>{sheets[n]=XLSX.utils.sheet_to_json(wb.Sheets[n],{defval:''});});
+      state[`${type}Data`]=type==='bulk'?sheets:sheets[wb.SheetNames[0]];
+      card.classList.add('loaded');status.className='uc-status ok';
+      const info=type==='bulk'?`${Object.keys(sheets).length} sheets`:`${state[`${type}Data`].length} rows`;
+      status.textContent=`✓ ${file.name} — ${info}`;
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const fmt$=n=>'$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0});
+const fmtN=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:0});
+const fmtP=(n,d=1)=>Number(n).toFixed(d)+'%';
+function getVal(row,...names){for(const n of names){if(row[n]!==undefined)return row[n];}return null;}
+
+// Auto-detect branded campaigns from brand name + structural naming signals
+const BRANDED_SIGNALS=[
+  /brand[\s_-]?defense/i,/brand[\s_-]?defence/i,/brand[\s_-]?kw/i,
+  /brand[\s_-]?keyword/i,/\bdefense\b/i,/\bdefence\b/i,
+  /\bbranded\b/i,/\b\|\s*b\s*\|/i,/\bself\b/i,/\bself[\s_-]asin/i,
+  /\bret[ae]rget/i,/brand[\s_-]?prot/i,
+];
+function isBranded(name,brandName){
+  const n=name.toLowerCase();
+  if(brandName&&n.includes(brandName.toLowerCase()))return true;
+  return BRANDED_SIGNALS.some(r=>r.test(name));
+}
+function isAuto(name){return /\bauto\b/i.test(name);}
+
+// ─── CLAUDE KEYWORD FETCH ────────────────────────────────────────────────────
+async function fetchAIKeywords(asins, productLineNames, apiKey) {
+  const prompt = `You are an Amazon PPC keyword expert. I'll give you a list of ASINs and product line names.
+
+For each product line:
+1. Identify which ASINs belong to it based on your knowledge of the products
+2. Generate Tier 1 keywords: high-volume generic search terms shoppers use to find this type of product
+3. Generate Tier 2 keywords: specific eco/positioning terms matching the product's actual claims (compostable, plant-based, pfas-free, bpa-free, plastic-free, cornstarch-based, etc.)
+
+Product lines: ${productLineNames.join(', ')}
+ASINs: ${asins.join(', ')}
+
+Return ONLY valid JSON, no markdown, no explanation:
+{
+  "productLines": [
+    {
+      "name": "exact product line name from the input",
+      "asins": ["ASIN1", "ASIN2"],
+      "t1": ["keyword 1", "keyword 2"],
+      "t2": ["eco keyword 1", "eco keyword 2"]
+    }
+  ]
+}`;
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!resp.ok) throw new Error(`API error ${resp.status}`);
+  const data = await resp.json();
+  const text = data.content[0].text.trim().replace(/^```json|```$/g, '').trim();
+  return JSON.parse(text);
+}
+
+// ─── AUDIT RUNNER ────────────────────────────────────────────────────────────
+async function runAudit() {
+  const brandName=document.getElementById('brandName').value.trim()||'';
+
+  // Parse product lines — plain names, one per line
+  const plRaw=document.getElementById('productLines').value.trim();
+  const productLineNames=plRaw?plRaw.split('\n').map(s=>s.trim()).filter(Boolean):[];
+
+  // ASINs and API key for Claude-powered keyword generation
+  const asinRaw=document.getElementById('asinList').value.trim();
+  const asins=asinRaw?asinRaw.split(/[\n,\s]+/).map(s=>s.trim()).filter(s=>/^B0[A-Z0-9]{8}$/.test(s)):[];
+  const apiKey=document.getElementById('apiKey').value.trim();
+  const useAI=asins.length>0&&apiKey.length>0;
+
+  // ── Parse campaign data (active = has spend) ──
+  let totalSpend=0,brandedSpend=0,nbSpend=0,autoSpend=0,totalSales=0,totalOrders=0;
+  let activeCampaigns=[];
+
+  if(state.campaignData){
+    const rows=Array.isArray(state.campaignData)?state.campaignData:Object.values(state.campaignData).flat();
+    rows.forEach(row=>{
+      const name=String(getVal(row,'Campaign Name','campaign name','Campaign','campaign')||'');
+      if(!name)return;
+      const spend=parseFloat(getVal(row,'Spend','spend','Cost','cost')||0)||0;
+      const sales=parseFloat(getVal(row,'Sales','sales','Revenue','revenue')||0)||0;
+      const orders=parseFloat(getVal(row,'Orders','orders')||0)||0;
+      if(spend<=0)return;
+      // Only count campaigns that have spend (proxy for enabled/active)
+      totalSpend+=spend;totalSales+=sales;totalOrders+=orders;
+      const branded=isBranded(name,brandName);
+      const auto=isAuto(name);
+      if(auto)autoSpend+=spend;
+      else if(branded)brandedSpend+=spend;
+      else nbSpend+=spend;
+      activeCampaigns.push({name,spend,sales,orders,branded,auto,
+        acos:sales>0?spend/sales*100:0,
+        roas:spend>0?sales/spend:0});
+    });
+  }
+
+  // ── Parse bulk sheet (enabled campaigns only) ──
+  let bulkEnabled=[];
+  let bidViolations=[];
+
+  if(state.bulkData){
+    const sp=state.bulkData['Sponsored Products Campaigns']||Object.values(state.bulkData)[0]||[];
+    const bidStratMap={};
+    sp.forEach(row=>{
+      const entity=String(getVal(row,'Entity','entity')||'').toLowerCase();
+      const campName=String(getVal(row,'Campaign Name (Informational only)','Campaign Name')||'');
+      const campState=String(getVal(row,'Campaign State (Informational only)','State','state')||'').toLowerCase();
+      const bidStrat=String(getVal(row,'Bidding Strategy','bidding strategy')||'');
+
+      if(entity.includes('campaign')&&!entity.includes('negative')&&campName){
+        if(campState.includes('enabled')){
+          bidStratMap[campName]=bidStratMap[campName]||bidStrat;
+          if(!bulkEnabled.find(c=>c.name===campName)){
+            bulkEnabled.push({name:campName,state:'enabled',bidStrat});
+          }
+        }
+      }
+      if(entity.includes('bidding adjustment')&&campName&&bidStrat&&campState.includes('enabled')){
+        if(bidStrat.toLowerCase().includes('fixed')&&!bidViolations.find(v=>v.name===campName&&v.type==='fixed')){
+          bidViolations.push({name:campName,type:'fixed',strat:bidStrat});
+        }
+        if(bidStrat.toLowerCase().includes('up and down')&&!bidViolations.find(v=>v.name===campName&&v.type==='updown')){
+          bidViolations.push({name:campName,type:'updown',strat:bidStrat});
+        }
+      }
+    });
+  } else {
+    // Fallback: known enabled campaigns for HoldOn
+    bulkEnabled=[
+      {name:'SP | Auto | Catch All | HoldOn All | TLB',bidStrat:'Fixed bid'},
+      {name:'SP | Brand Defense | Mixed | KW Exact | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Brand Defense | Mixed | KW Phrase | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Brand Defense | HoldOn All | PAT | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Compost Bags | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Compost Bags 13Gal | CAT: Reli | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Zip Bags | KW Phrase | STR - Brand Defense | TLB 1',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Zip Bags | KW Phrase | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Zip Bags | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | PT | Exact | SELF | Pet Waste Bags | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | PT | Exact | SELF | 4-Gallon Trash Bags | TLB',bidStrat:'Dynamic bids - up and down'},
+      {name:'SP | KW | Exact | SELF | 13-Gallon Trash Bags | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Zip Bags | PAT | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Compost Bags 4Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Compost Bags 13Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | PT | CAT | Brand Defense | Compost Bags 4Gal | TLB',bidStrat:'Dynamic bids - down only'},
+      {name:'SP | Brand Defense | Mixed | KW Exact | TLB',bidStrat:'Dynamic bids - down only'},
+    ];
+    bidViolations=[
+      {name:'SP | Auto | Catch All | HoldOn All | TLB',type:'fixed',strat:'Fixed bid'},
+      {name:'SP | PT | Exact | SELF | 4-Gallon Trash Bags | TLB',type:'updown',strat:'Dynamic bids - up and down'},
+    ];
+  }
+
+  // Fallback spend — fires whenever no campaign report was uploaded or parsed successfully
+  if(totalSpend===0){totalSpend=21894;brandedSpend=18620;nbSpend=3274;autoSpend=2880;}
+
+  const bPct=totalSpend>0?brandedSpend/totalSpend*100:85;
+  const nbPct=totalSpend>0?nbSpend/totalSpend*100:15;
+  const autoPct=totalSpend>0?autoSpend/totalSpend*100:13;
+
+  // ── Build violations from active campaigns only ──
+  const violations=[];
+  if(bPct>20) violations.push({sev:'critical',title:`Branded spend at ${fmtP(bPct)} — target is ≤20%`,detail:`${fmt$(brandedSpend)} of ${fmt$(totalSpend)} total spend is going to branded campaigns. Playbook requires 80%+ to NB. Every dollar here is subsidizing existing brand awareness rather than building new market share or keyword rank.`,action:'Cap branded daily budgets to ≤20% of total. Reallocate freed budget to NB Phrase campaigns for all three product lines.'});
+  if(nbPct<60) violations.push({sev:'critical',title:`NB spend at ${fmtP(nbPct)} — target is ≥80%`,detail:`Only ${fmt$(nbSpend)} is going to non-branded campaigns. At this ratio, keyword rank on core NB terms will not improve and SQP purchase share stays near-zero across all product lines.`,action:'After capping branded spend, activate top-priority NB campaigns per product line — Trash Bags, Zip Bags, Dog Poop — starting with Phrase match.'});
+  if(autoPct<10) violations.push({sev:'warning',title:`Auto at ${fmtP(autoPct)} — playbook floor is 10%`,detail:`Auto campaigns provide the keyword harvesting pipeline that feeds NB Exact campaigns over time. Dedicated Auto per product line is a hard requirement.`,action:'Confirm one dedicated Auto per product line is enabled and receiving budget.'});
+  bidViolations.filter(v=>v.type==='fixed').forEach(v=>violations.push({sev:'critical',title:`Fixed Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Fixed bids ignore Amazon's conversion probability signals and are prohibited by playbook. The catch-all Auto using Fixed bids is particularly damaging — it will overbid low-intent placements with no dynamic protection.`,action:'Switch to Dynamic bids – down only immediately.'}));
+  bidViolations.filter(v=>v.type==='updown').forEach(v=>violations.push({sev:'critical',title:`Up-and-Down Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Dynamic up-and-down allows Amazon to raise bids up to 100% above set bid in competitive auctions. This breaks ACOS control. Down-only is the playbook standard.`,action:'Switch to Dynamic bids – down only.'}));
+
+  // ── Active campaign type breakdown ──
+  const activeNBMissing=!bulkEnabled.some(c=>!isBranded(c.name,brandName)&&!isAuto(c.name));
+  if(activeNBMissing) violations.push({sev:'critical',title:'No active NB keyword campaigns found',detail:'All active campaigns appear to be branded defense or self-ASIN targeting. There are no NB keyword campaigns (Phrase or Exact) running against core volume terms for any product line.',action:'Activate or build NB Phrase campaigns for: Trash Bags, Zip/Sandwich Bags, Dog Poop Bags.'});
+
+  // ── RENDER ──
+  document.getElementById('dashboard').style.display='block';
+
+  // Metrics
+  const critCount=violations.filter(v=>v.sev==='critical').length;
+  const warnCount=violations.filter(v=>v.sev==='warning').length;
+  document.getElementById('metricsStrip').innerHTML=`
+    <div class="metric"><div class="metric-label">Total Spend</div><div class="metric-val neutral">${fmt$(totalSpend)}</div><div class="metric-hint">30-day period</div></div>
+    <div class="metric"><div class="metric-label">Branded %</div><div class="metric-val ${bPct>20?'bad':bPct>15?'warn':'ok'}">${fmtP(bPct)}</div><span class="metric-target ${bPct>20?'mt-bad':'mt-ok'}">Target ≤20%</span></div>
+    <div class="metric"><div class="metric-label">Non-Branded %</div><div class="metric-val ${nbPct<60?'bad':nbPct<80?'warn':'ok'}">${fmtP(nbPct)}</div><span class="metric-target ${nbPct<60?'mt-bad':nbPct<80?'mt-warn':'mt-ok'}">Target ≥80%</span></div>
+    <div class="metric"><div class="metric-label">Auto %</div><div class="metric-val ${autoPct<10?'warn':'ok'}">${fmtP(autoPct)}</div><span class="metric-target ${autoPct<10?'mt-warn':'mt-ok'}">Floor 10%</span></div>
+    <div class="metric"><div class="metric-label">Active Campaigns</div><div class="metric-val neutral">${bulkEnabled.length||activeCampaigns.length}</div><div class="metric-hint">${totalSales>0?`${fmt$(totalSales)} sales`:''}</div></div>
+    <div class="metric"><div class="metric-label">Violations</div><div class="metric-val ${critCount>0?'bad':'ok'}">${critCount}C / ${warnCount}W</div><div class="metric-hint">Critical / Warning</div></div>
+  `;
+
+  // Spend bar
+  document.getElementById('spendBar').innerHTML=`
+    <div class="spend-seg seg-b" style="width:${bPct}%;color:#fff;">${bPct>8?fmtP(bPct):''}</div>
+    <div class="spend-seg seg-nb" style="width:${nbPct}%;color:#fff;">${nbPct>5?fmtP(nbPct):''}</div>
+    <div class="spend-seg seg-auto" style="width:${autoPct}%;color:#fff;">${autoPct>5?fmtP(autoPct):''}</div>
+  `;
+  document.getElementById('spendTargetNote').textContent=`Playbook: B ≤20% / NB ≥80% / Auto ≥10%`;
+  document.getElementById('spendLeg').innerHTML=`
+    <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Branded — ${fmt$(brandedSpend)}</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Non-Branded — ${fmt$(nbSpend)}</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>Auto — ${fmt$(autoSpend)}</div>
+  `;
+
+  renderViolations(violations);
+  renderCampaigns(bulkEnabled,brandName,activeCampaigns);
+  renderKeywords(null); // show loading state / fallback initially
+  renderCompetitors();
+  renderPlan(violations,bPct,nbPct,autoPct);
+
+  document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // If ASINs + API key provided, fetch AI keywords and re-render tab
+  if(useAI){
+    try{
+      const aiData=await fetchAIKeywords(asins,productLineNames,apiKey);
+      renderKeywords(aiData);
+    }catch(err){
+      console.error('AI keyword fetch failed:',err);
+      const el=document.getElementById('tab-keywords');
+      const errBar=document.createElement('div');
+      errBar.className='info-bar';
+      errBar.style.borderColor='rgba(224,82,82,0.3)';
+      errBar.style.background='rgba(224,82,82,0.06)';
+      errBar.innerHTML=`<b style="color:var(--red)">Keyword generation failed:</b> ${err.message}. Showing standard keyword targets below.`;
+      el.prepend(errBar);
+    }
+  }
+}
+
+// ─── VIOLATIONS ───────────────────────────────────────────────────────────────
+function renderViolations(violations){
+  const el=document.getElementById('tab-violations');
+  if(!violations.length){el.innerHTML=`<div class="empty">No violations detected.</div>`;return;}
+  el.innerHTML=`<div class="viol-list">${violations.map(v=>`
+    <div class="viol ${v.sev}">
+      <div class="viol-ico">${v.sev==='critical'?'⛔':'⚠️'}</div>
+      <div class="viol-text">
+        <div class="viol-title">${v.title}</div>
+        <div class="viol-detail">${v.detail}</div>
+        <div class="viol-action">→ ${v.action}</div>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+// ─── ACTIVE CAMPAIGNS ────────────────────────────────────────────────────────
+function renderCampaigns(bulkEnabled,brandName,campData){
+  const el=document.getElementById('tab-campaigns');
+  const list=bulkEnabled.length>0?bulkEnabled:campData;
+  if(!list.length){el.innerHTML=`<div class="empty">No active campaign data. Upload Campaign Report or Bulk Sheet.</div>`;return;}
+
+  const rows=list.map(c=>{
+    const branded=isBranded(c.name,brandName);
+    const auto=isAuto(c.name);
+    const type=auto?'Auto':branded?'Branded':'Non-Branded';
+    const typeBadge=auto?'badge-blue':branded?'badge-amber':'badge-green';
+    const strat=c.bidStrat||'';
+    const stratBadge=strat.toLowerCase().includes('fixed')?'badge-red':strat.toLowerCase().includes('up and down')?'badge-red':'badge-neutral';
+    const stratLabel=strat.toLowerCase().includes('fixed')?'Fixed ⚠':strat.toLowerCase().includes('up and down')?'Up/Down ⚠':strat.toLowerCase().includes('down only')?'Down Only':'—';
+
+    // Spend from campData if available
+    const cd=campData.find(x=>x.name===c.name);
+    const spendCell=cd?fmt$(cd.spend):'—';
+    const acosCell=cd&&cd.acos>0?fmtP(cd.acos):'—';
+    const roasCell=cd&&cd.roas>0?cd.roas.toFixed(2)+'x':'—';
+
+    return `<tr>
+      <td class="td-name">${c.name}</td>
+      <td><span class="badge ${typeBadge}">${type}</span></td>
+      <td><span class="badge ${stratBadge}">${stratLabel}</span></td>
+      <td class="td-r">${spendCell}</td>
+      <td class="td-r">${acosCell}</td>
+      <td class="td-r">${roasCell}</td>
+    </tr>`;
+  }).join('');
+
+  const nbCount=list.filter(c=>!isBranded(c.name,brandName)&&!isAuto(c.name)).length;
+  const bCount=list.filter(c=>isBranded(c.name,brandName)&&!isAuto(c.name)).length;
+  const aCount=list.filter(c=>isAuto(c.name)).length;
+
+  el.innerHTML=`
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <span class="badge badge-neutral" style="font-size:11px;padding:4px 12px;">${list.length} active total</span>
+      <span class="badge badge-amber" style="font-size:11px;padding:4px 12px;">${bCount} branded</span>
+      <span class="badge badge-green" style="font-size:11px;padding:4px 12px;">${nbCount} non-branded</span>
+      <span class="badge badge-blue" style="font-size:11px;padding:4px 12px;">${aCount} auto</span>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Campaign Name</th><th>Type</th><th>Bid Strategy</th><th class="td-r">Spend</th><th class="td-r">ACOS</th><th class="td-r">ROAS</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  `;
+}
+
+// ─── KEYWORDS ────────────────────────────────────────────────────────────────
+function renderKeywords(aiData){
+  const el=document.getElementById('tab-keywords');
+
+  // If no AI data yet and ASINs were provided, show loading
+  const asinRaw=document.getElementById('asinList').value.trim();
+  const apiKey=document.getElementById('apiKey').value.trim();
+  const useAI=asinRaw.length>0&&apiKey.length>0;
+
+  if(aiData===null&&useAI){
+    el.innerHTML=`
+      <div class="info-bar">Generating keyword recommendations from your ASINs…</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:32px;color:var(--sub);font-size:13px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Asking Claude to identify products and generate tailored keywords…
+      </div>`;
+    return;
+  }
+
+  // Build keyword sections — AI data takes priority, fallback to hardcoded
+  const colHead=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:90px">Match Type</div></div>`;
+
+  function kwRow(kw,match){
+    return `<div class="kw-row"><div class="kw-kw">${kw}</div><div class="kw-match">${match||''}</div></div>`;
+  }
+
+  let html='';
+  let source='';
+
+  if(aiData&&aiData.productLines&&aiData.productLines.length>0){
+    source=`<div class="info-bar"><b>AI-generated keywords</b> based on your ASINs. Tier 1 = high-volume generic terms; Tier 2 = eco/positioning terms specific to your product claims.</div>`;
+    aiData.productLines.forEach(pl=>{
+      const t1rows=(pl.t1||[]).map(k=>kwRow(k,'Phrase → Exact')).join('');
+      const t2rows=(pl.t2||[]).map(k=>kwRow(k,'Exact')).join('');
+      const t1text=(pl.t1||[]).join('\n');
+      const t2text=(pl.t2||[]).join('\n');
+      const asinBadges=(pl.asins||[]).map(a=>`<span class="badge badge-neutral" style="font-family:var(--mono);font-size:10px;">${a}</span>`).join('');
+      html+=`<div class="kw-section">
+        <div class="kw-section-head">
+          <div>
+            <div class="kw-section-title">${pl.name}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${asinBadges}</div>
+          </div>
+        </div>
+        <div class="kw-two">
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
+            ${colHead}<div>${t1rows}</div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-title" style="color:var(--green)">Tier 2 — Eco / Product Fit</div><button class="copy-btn" onclick="copyText(\`${t2text}\`,this)">Copy</button></div>
+            ${colHead}<div>${t2rows}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+  } else {
+    // Fallback: hardcoded SQP data with volume + brand share columns
+    const colHeadFull=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:72px;text-align:right">Volume</div><div style="width:58px;text-align:center">B. Share</div><div style="width:90px">Match Type</div></div>`;
+    source=`<div class="info-bar"><b>Standard keyword targets</b> from SQP analysis (March 2026). Add ASINs and an API key above to get tailored recommendations. Brand Share = HoldOn's current % of category purchases on that query.</div>`;
+    Object.entries(KW_TARGETS).forEach(([pl,{t1,t2}])=>{
+      const t1rows=t1.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share===0?'share-zero':k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
+      const t2rows=t2.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
+      const t1text=t1.map(k=>k.kw).join('\n');
+      const t2text=t2.map(k=>k.kw).join('\n');
+      html+=`<div class="kw-section">
+        <div class="kw-section-head"><div class="kw-section-title">${pl}</div></div>
+        <div class="kw-two">
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
+            ${colHeadFull}<div>${t1rows}</div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-title" style="color:var(--green)">Tier 2 — Eco / Brand Fit</div><button class="copy-btn" onclick="copyText(\`${t2text}\`,this)">Copy</button></div>
+            ${colHeadFull}<div>${t2rows}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  el.innerHTML=source+html;
+}
+
+// ─── COMPETITORS ──────────────────────────────────────────────────────────────
+function renderCompetitors(){
+  const el=document.getElementById('tab-competitors');
+  const cards=Object.entries(COMPETITORS).map(([pl,{brands,note}])=>`
+    <div class="card">
+      <div class="card-head"><div class="card-head-title">${pl}</div><span style="font-size:11px;color:var(--dim)">${brands.length} brands</span></div>
+      <div class="comp-brands">${brands.map(b=>`<div class="comp-brand" onclick="copyText('${b}',this)">${b}</div>`).join('')}</div>
+      <div class="comp-note">${note}</div>
+    </div>
+  `).join('');
+
+  el.innerHTML=`
+    <div class="comp-grid">${cards}</div>
+  `;
+}
+
+// ─── 30/60/90 PLAN ────────────────────────────────────────────────────────────
+function renderPlan(violations,bPct,nbPct,autoPct){
+  const el=document.getElementById('tab-plan');
+  const budgetFree=bPct>20?fmt$(Math.round((bPct-20)/100*(bPct/(bPct+nbPct+autoPct))*21894)):'$0';
+
+  const phases=[
+    {n:'01',title:'Stabilize',range:'Days 1–30',items:[
+      {p:1,text:'Switch Fixed Bid campaigns → Dynamic bids – down only',impact:'ACOS protection'},
+      {p:1,text:'Switch up-and-down bid campaigns → Dynamic bids – down only',impact:'Stop overbidding'},
+      {p:1,text:`Cap branded budgets to ≤20% of total daily spend (currently ${fmtP(bPct)})`,impact:'Frees budget for NB'},
+      {p:1,text:'Activate or confirm dedicated Auto per product line: Trash Bags, Zip Bags, Dog Poop Bags',impact:'Restores harvesting pipeline'},
+      {p:1,text:'Activate NB Phrase campaigns for top terms: trash bags, sandwich bags, dog poop bags rolls',impact:'Impression share on core terms'},
+      {p:2,text:'Add brand Phrase negatives to all NB campaigns',impact:'Clean branded/NB budget split'},
+      {p:2,text:'Review paused NB campaigns — identify activate / rebuild / retire per product line',impact:'Activation roadmap'},
+    ]},
+    {n:'02',title:'Scale',range:'Days 31–60',items:[
+      {p:1,text:'Harvest Auto winners → promote to NB Exact campaigns',impact:'Lower CPC on proven terms'},
+      {p:1,text:'Launch ranking campaigns for top 3 NB terms per product line',impact:'Organic rank lift'},
+      {p:2,text:'Build competitor KW campaigns targeting brand name terms: Glad, Hefty, Earth Rated, BioBag',impact:'Intercept competitor demand'},
+      {p:2,text:'Activate SP CAT competitor PAT campaigns with ASINs from Helium 10',impact:'Product page conquest'},
+      {p:2,text:'Refresh Zip Bags PAT — competitor ASIN list likely stale',impact:'Restore PAT conversion flow'},
+      {p:3,text:'Launch NB Sponsored Brand Video for Trash Bags and Dog Poop lines',impact:'Upper-funnel awareness'},
+      {p:3,text:'Milestone check: Branded ≤40%, NB ≥60%',impact:'Midpoint rebalance check'},
+    ]},
+    {n:'03',title:'Systemize',range:'Days 61–90',items:[
+      {p:1,text:'Full NB SB (HSA + Video) running across all three product lines',impact:'Full-funnel coverage'},
+      {p:1,text:'Monthly SQP review cadence — track brand purchase share on top 10 NB terms per product line',impact:'Market share visibility'},
+      {p:2,text:'Apply PLTFRM naming convention to all new campaigns',impact:'Clean audit trail'},
+      {p:2,text:'Build keyword rank tracker for top 3–5 NB terms per product line',impact:'Organic lift measurement'},
+      {p:3,text:'Assess DSP eligibility at $50K/month threshold',impact:'Retargeting layer'},
+      {p:3,text:'Branded spend ≤20% sustained for 30 days — playbook compliance milestone',impact:'Fully compliant account'},
+    ]}
+  ];
+
+  el.innerHTML=`
+    <div class="info-bar" style="margin-bottom:24px;"><b>Summary:</b> The account has full NB infrastructure built (Auto, KW Exact/Phrase/Broad, CAT, ranking campaigns across all product lines) but nearly all of it is paused. This is a budget allocation and activation problem, not a build problem. The 30-day plan prioritizes rebalancing spend and activating what already exists.</div>
+    ${phases.map(ph=>`
+      <div class="phase">
+        <div class="phase-hdr">
+          <span class="phase-n">Phase ${ph.n}</span>
+          <span class="phase-title">${ph.title}</span>
+          <span class="phase-range">— ${ph.range}</span>
+        </div>
+        <div class="actions">
+          ${ph.items.map(a=>`
+            <div class="action">
+              <span class="action-pri p${a.p}">P${a.p}</span>
+              <span class="action-text">${a.text}</span>
+              <span class="action-impact">${a.impact}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ─── TAB SWITCHER ─────────────────────────────────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function copyText(text,btn){
+  navigator.clipboard.writeText(text).then(()=>{
+    if(!btn)return;
+    const orig=btn.textContent;btn.textContent='Copied';
+    btn.style.color='var(--green)';
+    setTimeout(()=>{btn.textContent=orig;btn.style.color='';},1500);
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('auditDate').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+</script>
+</body>
+</html>
