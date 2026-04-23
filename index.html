@@ -435,18 +435,36 @@ function isAuto(name){return /\bauto\b/i.test(name);}
 function runAudit() {
   const brandName=document.getElementById('brandName').value.trim()||'';
 
+  if(!state.campaignData && !state.bulkData){
+    alert('Please upload at least a Campaign Report or Bulk Sheet before running the audit.');
+    return;
+  }
+
   // ── Parse campaign data ──
+  // Amazon exports use varied column names — check all known variants
   let totalSpend=0,brandedSpend=0,nbSpend=0,autoSpend=0,totalSales=0,totalOrders=0;
   let activeCampaigns=[];
 
   if(state.campaignData){
     const rows=Array.isArray(state.campaignData)?state.campaignData:Object.values(state.campaignData).flat();
     rows.forEach(row=>{
-      const name=String(getVal(row,'Campaign Name','campaign name','Campaign','campaign')||'');
+      const name=String(getVal(row,
+        'Campaign Name','campaign name','Campaign','campaign'
+      )||'');
       if(!name)return;
-      const spend=parseFloat(getVal(row,'Spend','spend','Cost','cost')||0)||0;
-      const sales=parseFloat(getVal(row,'Sales','sales','Revenue','revenue')||0)||0;
-      const orders=parseFloat(getVal(row,'Orders','orders')||0)||0;
+      const spend=parseFloat(getVal(row,
+        'Spend','spend','Cost','cost'
+      )||0)||0;
+      const sales=parseFloat(getVal(row,
+        'Sales','sales','Revenue','revenue',
+        '7 Day Total Sales ($)','14 Day Total Sales ($)',
+        '7 Day Total Sales','14 Day Total Sales'
+      )||0)||0;
+      const orders=parseFloat(getVal(row,
+        'Orders','orders',
+        '7 Day Total Orders (#)','14 Day Total Orders (#)',
+        '7 Day Total Orders','14 Day Total Orders'
+      )||0)||0;
       if(spend<=0)return;
       totalSpend+=spend;totalSales+=sales;totalOrders+=orders;
       const branded=isBranded(name,brandName);
@@ -461,58 +479,45 @@ function runAudit() {
   }
 
   // ── Parse bulk sheet ──
+  // Bid strategy lives on the Campaign entity row itself, not on bidding adjustment rows
   let bulkEnabled=[];
   let bidViolations=[];
 
   if(state.bulkData){
-    const sp=state.bulkData['Sponsored Products Campaigns']||Object.values(state.bulkData)[0]||[];
+    // Try SP sheet first, fall back to first sheet
+    const sp=state.bulkData['Sponsored Products Campaigns']
+      ||state.bulkData['SP Campaigns']
+      ||Object.values(state.bulkData)[0]
+      ||[];
     sp.forEach(row=>{
-      const entity=String(getVal(row,'Entity','entity')||'').toLowerCase();
-      const campName=String(getVal(row,'Campaign Name (Informational only)','Campaign Name')||'');
-      const campState=String(getVal(row,'Campaign State (Informational only)','State','state')||'').toLowerCase();
-      const bidStrat=String(getVal(row,'Bidding Strategy','bidding strategy')||'');
-      if(entity.includes('campaign')&&!entity.includes('negative')&&campName){
+      const entity=String(getVal(row,'Entity','entity')||'').toLowerCase().trim();
+      const campName=String(getVal(row,
+        'Campaign Name (Informational only)','Campaign Name','campaign name'
+      )||'').trim();
+      const campState=String(getVal(row,
+        'Campaign State (Informational only)','Campaign State','State','state'
+      )||'').toLowerCase();
+      const bidStrat=String(getVal(row,
+        'Bidding Strategy','bidding strategy','Bid Strategy','bid strategy'
+      )||'');
+
+      // Campaign rows carry the bid strategy — capture enabled ones
+      if(entity==='campaign'&&campName){
         if(campState.includes('enabled')){
           if(!bulkEnabled.find(c=>c.name===campName)){
             bulkEnabled.push({name:campName,state:'enabled',bidStrat});
           }
-        }
-      }
-      if(entity.includes('bidding adjustment')&&campName&&bidStrat&&campState.includes('enabled')){
-        if(bidStrat.toLowerCase().includes('fixed')&&!bidViolations.find(v=>v.name===campName&&v.type==='fixed')){
-          bidViolations.push({name:campName,type:'fixed',strat:bidStrat});
-        }
-        if(bidStrat.toLowerCase().includes('up and down')&&!bidViolations.find(v=>v.name===campName&&v.type==='updown')){
-          bidViolations.push({name:campName,type:'updown',strat:bidStrat});
+          // Detect bid strategy violations directly from campaign row
+          if(bidStrat.toLowerCase().includes('fixed')&&!bidViolations.find(v=>v.name===campName&&v.type==='fixed')){
+            bidViolations.push({name:campName,type:'fixed',strat:bidStrat});
+          }
+          if(bidStrat.toLowerCase().includes('up and down')&&!bidViolations.find(v=>v.name===campName&&v.type==='updown')){
+            bidViolations.push({name:campName,type:'updown',strat:bidStrat});
+          }
         }
       }
     });
-  } else {
-    bulkEnabled=[
-      {name:'SP | Auto | Catch All | HoldOn All | TLB',bidStrat:'Fixed bid'},
-      {name:'SP | Brand Defense | Mixed | KW Exact | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Brand Defense | Mixed | KW Phrase | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Brand Defense | HoldOn All | PAT | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Compost Bags | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Compost Bags 13Gal | CAT: Reli | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Zip Bags | KW Phrase | STR - Brand Defense | TLB 1',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Zip Bags | KW Phrase | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Zip Bags | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | PT | Exact | SELF | Pet Waste Bags | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | PT | Exact | SELF | 4-Gallon Trash Bags | TLB',bidStrat:'Dynamic bids - up and down'},
-      {name:'SP | KW | Exact | SELF | 13-Gallon Trash Bags | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Zip Bags | PAT | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Compost Bags 4Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Compost Bags 13Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | PT | CAT | Brand Defense | Compost Bags 4Gal | TLB',bidStrat:'Dynamic bids - down only'},
-    ];
-    bidViolations=[
-      {name:'SP | Auto | Catch All | HoldOn All | TLB',type:'fixed',strat:'Fixed bid'},
-      {name:'SP | PT | Exact | SELF | 4-Gallon Trash Bags | TLB',type:'updown',strat:'Dynamic bids - up and down'},
-    ];
   }
-
-  if(totalSpend===0){totalSpend=21894;brandedSpend=18620;nbSpend=3274;autoSpend=2880;}
 
   const bPct=totalSpend>0?brandedSpend/totalSpend*100:85;
   const nbPct=totalSpend>0?nbSpend/totalSpend*100:15;
