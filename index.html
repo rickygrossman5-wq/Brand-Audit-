@@ -204,7 +204,6 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .info-bar b{color:var(--acc);}
 .divider{height:1px;background:var(--b1);margin:20px 0;}
 #dashboard{display:none;}
-@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -248,29 +247,18 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         </label>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:20px;padding-top:4px;">
-        <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
-          <div class="config-field">
-            <label>Brand name</label>
-            <input type="text" id="brandName" placeholder="e.g. HoldOn" style="width:200px;" />
-            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Detects branded campaigns automatically.</div>
-          </div>
-          <div class="config-field">
-            <label>Product lines <span style="font-weight:400;color:var(--dim)">(one per line)</span></label>
-            <textarea id="productLines" placeholder="Trash Bags&#10;Zip Bags&#10;Dog Poop Bags" style="width:260px;height:78px;"></textarea>
-          </div>
-          <div class="config-field">
-            <label>ASINs for keyword generation <span style="font-weight:400;color:var(--dim)">(optional, one per line)</span></label>
-            <textarea id="asinList" placeholder="B0BLJ41Y82&#10;B0CVH42486&#10;B0D4FF1JHL" style="width:260px;height:78px;"></textarea>
-            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Claude will identify each product and generate tailored keywords.</div>
-          </div>
-          <div class="config-field">
-            <label>Anthropic API key <span style="font-weight:400;color:var(--dim)">(for ASIN keywords)</span></label>
-            <input type="password" id="apiKey" placeholder="sk-ant-..." style="width:220px;" />
-            <div style="font-size:11px;color:var(--dim);margin-top:5px;">Used client-side only. Never stored or sent anywhere else.</div>
-          </div>
+      <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;padding-top:4px;">
+        <div class="config-field">
+          <label>Brand name</label>
+          <input type="text" id="brandName" placeholder="e.g. HoldOn" style="width:200px;" />
+          <div style="font-size:11px;color:var(--dim);margin-top:5px;">Detects branded campaigns automatically.</div>
         </div>
-        <div>
+        <div class="config-field">
+          <label>ASINs <span style="font-weight:400;color:var(--dim)">(one per line — share with Claude to generate keywords)</span></label>
+          <textarea id="asinList" placeholder="B0BLJ41Y82&#10;B0CVH42486&#10;B0D4FF1JHL" style="width:280px;height:78px;"></textarea>
+          <div style="font-size:11px;color:var(--dim);margin-top:5px;">Paste these in chat → Claude identifies products → updated HTML with tailored keywords.</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px;">
           <button class="btn btn-primary" onclick="runAudit()" id="runBtn">Run Audit</button>
         </div>
       </div>
@@ -314,7 +302,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 // ─── STATE ────────────────────────────────────────────────────────────────────
 const state = { campaignData:null, bulkData:null, sqpData:null };
 
-// ─── KEYWORD TARGETS (from SQP March 2026 analysis) ──────────────────────────
+// ─── KEYWORD TARGETS ──────────────────────────────────────────────────────────
+// To update: paste your ASINs in chat → Claude identifies products → returns updated KW_TARGETS block
 const KW_TARGETS = {
   'Trash / Kitchen / Compost Bags':{
     t1:[
@@ -429,7 +418,6 @@ const fmtN=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:0});
 const fmtP=(n,d=1)=>Number(n).toFixed(d)+'%';
 function getVal(row,...names){for(const n of names){if(row[n]!==undefined)return row[n];}return null;}
 
-// Auto-detect branded campaigns from brand name + structural naming signals
 const BRANDED_SIGNALS=[
   /brand[\s_-]?defense/i,/brand[\s_-]?defence/i,/brand[\s_-]?kw/i,
   /brand[\s_-]?keyword/i,/\bdefense\b/i,/\bdefence\b/i,
@@ -443,66 +431,11 @@ function isBranded(name,brandName){
 }
 function isAuto(name){return /\bauto\b/i.test(name);}
 
-// ─── CLAUDE KEYWORD FETCH ────────────────────────────────────────────────────
-async function fetchAIKeywords(asins, productLineNames, apiKey) {
-  const prompt = `You are an Amazon PPC keyword expert. I'll give you a list of ASINs and product line names.
-
-For each product line:
-1. Identify which ASINs belong to it based on your knowledge of the products
-2. Generate Tier 1 keywords: high-volume generic search terms shoppers use to find this type of product
-3. Generate Tier 2 keywords: specific eco/positioning terms matching the product's actual claims (compostable, plant-based, pfas-free, bpa-free, plastic-free, cornstarch-based, etc.)
-
-Product lines: ${productLineNames.join(', ')}
-ASINs: ${asins.join(', ')}
-
-Return ONLY valid JSON, no markdown, no explanation:
-{
-  "productLines": [
-    {
-      "name": "exact product line name from the input",
-      "asins": ["ASIN1", "ASIN2"],
-      "t1": ["keyword 1", "keyword 2"],
-      "t2": ["eco keyword 1", "eco keyword 2"]
-    }
-  ]
-}`;
-
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!resp.ok) throw new Error(`API error ${resp.status}`);
-  const data = await resp.json();
-  const text = data.content[0].text.trim().replace(/^```json|```$/g, '').trim();
-  return JSON.parse(text);
-}
-
 // ─── AUDIT RUNNER ────────────────────────────────────────────────────────────
-async function runAudit() {
+function runAudit() {
   const brandName=document.getElementById('brandName').value.trim()||'';
 
-  // Parse product lines — plain names, one per line
-  const plRaw=document.getElementById('productLines').value.trim();
-  const productLineNames=plRaw?plRaw.split('\n').map(s=>s.trim()).filter(Boolean):[];
-
-  // ASINs and API key for Claude-powered keyword generation
-  const asinRaw=document.getElementById('asinList').value.trim();
-  const asins=asinRaw?asinRaw.split(/[\n,\s]+/).map(s=>s.trim()).filter(s=>/^B0[A-Z0-9]{8}$/.test(s)):[];
-  const apiKey=document.getElementById('apiKey').value.trim();
-  const useAI=asins.length>0&&apiKey.length>0;
-
-  // ── Parse campaign data (active = has spend) ──
+  // ── Parse campaign data ──
   let totalSpend=0,brandedSpend=0,nbSpend=0,autoSpend=0,totalSales=0,totalOrders=0;
   let activeCampaigns=[];
 
@@ -515,7 +448,6 @@ async function runAudit() {
       const sales=parseFloat(getVal(row,'Sales','sales','Revenue','revenue')||0)||0;
       const orders=parseFloat(getVal(row,'Orders','orders')||0)||0;
       if(spend<=0)return;
-      // Only count campaigns that have spend (proxy for enabled/active)
       totalSpend+=spend;totalSales+=sales;totalOrders+=orders;
       const branded=isBranded(name,brandName);
       const auto=isAuto(name);
@@ -528,22 +460,19 @@ async function runAudit() {
     });
   }
 
-  // ── Parse bulk sheet (enabled campaigns only) ──
+  // ── Parse bulk sheet ──
   let bulkEnabled=[];
   let bidViolations=[];
 
   if(state.bulkData){
     const sp=state.bulkData['Sponsored Products Campaigns']||Object.values(state.bulkData)[0]||[];
-    const bidStratMap={};
     sp.forEach(row=>{
       const entity=String(getVal(row,'Entity','entity')||'').toLowerCase();
       const campName=String(getVal(row,'Campaign Name (Informational only)','Campaign Name')||'');
       const campState=String(getVal(row,'Campaign State (Informational only)','State','state')||'').toLowerCase();
       const bidStrat=String(getVal(row,'Bidding Strategy','bidding strategy')||'');
-
       if(entity.includes('campaign')&&!entity.includes('negative')&&campName){
         if(campState.includes('enabled')){
-          bidStratMap[campName]=bidStratMap[campName]||bidStrat;
           if(!bulkEnabled.find(c=>c.name===campName)){
             bulkEnabled.push({name:campName,state:'enabled',bidStrat});
           }
@@ -559,7 +488,6 @@ async function runAudit() {
       }
     });
   } else {
-    // Fallback: known enabled campaigns for HoldOn
     bulkEnabled=[
       {name:'SP | Auto | Catch All | HoldOn All | TLB',bidStrat:'Fixed bid'},
       {name:'SP | Brand Defense | Mixed | KW Exact | TLB',bidStrat:'Dynamic bids - down only'},
@@ -577,7 +505,6 @@ async function runAudit() {
       {name:'SP | Compost Bags 4Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
       {name:'SP | Compost Bags 13Gal | KW Exact | STR - Brand Defense | TLB',bidStrat:'Dynamic bids - down only'},
       {name:'SP | PT | CAT | Brand Defense | Compost Bags 4Gal | TLB',bidStrat:'Dynamic bids - down only'},
-      {name:'SP | Brand Defense | Mixed | KW Exact | TLB',bidStrat:'Dynamic bids - down only'},
     ];
     bidViolations=[
       {name:'SP | Auto | Catch All | HoldOn All | TLB',type:'fixed',strat:'Fixed bid'},
@@ -585,29 +512,25 @@ async function runAudit() {
     ];
   }
 
-  // Fallback spend — fires whenever no campaign report was uploaded or parsed successfully
   if(totalSpend===0){totalSpend=21894;brandedSpend=18620;nbSpend=3274;autoSpend=2880;}
 
   const bPct=totalSpend>0?brandedSpend/totalSpend*100:85;
   const nbPct=totalSpend>0?nbSpend/totalSpend*100:15;
   const autoPct=totalSpend>0?autoSpend/totalSpend*100:13;
 
-  // ── Build violations from active campaigns only ──
+  // ── Violations ──
   const violations=[];
   if(bPct>20) violations.push({sev:'critical',title:`Branded spend at ${fmtP(bPct)} — target is ≤20%`,detail:`${fmt$(brandedSpend)} of ${fmt$(totalSpend)} total spend is going to branded campaigns. Playbook requires 80%+ to NB. Every dollar here is subsidizing existing brand awareness rather than building new market share or keyword rank.`,action:'Cap branded daily budgets to ≤20% of total. Reallocate freed budget to NB Phrase campaigns for all three product lines.'});
   if(nbPct<60) violations.push({sev:'critical',title:`NB spend at ${fmtP(nbPct)} — target is ≥80%`,detail:`Only ${fmt$(nbSpend)} is going to non-branded campaigns. At this ratio, keyword rank on core NB terms will not improve and SQP purchase share stays near-zero across all product lines.`,action:'After capping branded spend, activate top-priority NB campaigns per product line — Trash Bags, Zip Bags, Dog Poop — starting with Phrase match.'});
   if(autoPct<10) violations.push({sev:'warning',title:`Auto at ${fmtP(autoPct)} — playbook floor is 10%`,detail:`Auto campaigns provide the keyword harvesting pipeline that feeds NB Exact campaigns over time. Dedicated Auto per product line is a hard requirement.`,action:'Confirm one dedicated Auto per product line is enabled and receiving budget.'});
   bidViolations.filter(v=>v.type==='fixed').forEach(v=>violations.push({sev:'critical',title:`Fixed Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Fixed bids ignore Amazon's conversion probability signals and are prohibited by playbook. The catch-all Auto using Fixed bids is particularly damaging — it will overbid low-intent placements with no dynamic protection.`,action:'Switch to Dynamic bids – down only immediately.'}));
   bidViolations.filter(v=>v.type==='updown').forEach(v=>violations.push({sev:'critical',title:`Up-and-Down Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Dynamic up-and-down allows Amazon to raise bids up to 100% above set bid in competitive auctions. This breaks ACOS control. Down-only is the playbook standard.`,action:'Switch to Dynamic bids – down only.'}));
-
-  // ── Active campaign type breakdown ──
   const activeNBMissing=!bulkEnabled.some(c=>!isBranded(c.name,brandName)&&!isAuto(c.name));
   if(activeNBMissing) violations.push({sev:'critical',title:'No active NB keyword campaigns found',detail:'All active campaigns appear to be branded defense or self-ASIN targeting. There are no NB keyword campaigns (Phrase or Exact) running against core volume terms for any product line.',action:'Activate or build NB Phrase campaigns for: Trash Bags, Zip/Sandwich Bags, Dog Poop Bags.'});
 
-  // ── RENDER ──
+  // ── Render ──
   document.getElementById('dashboard').style.display='block';
 
-  // Metrics
   const critCount=violations.filter(v=>v.sev==='critical').length;
   const warnCount=violations.filter(v=>v.sev==='warning').length;
   document.getElementById('metricsStrip').innerHTML=`
@@ -619,7 +542,6 @@ async function runAudit() {
     <div class="metric"><div class="metric-label">Violations</div><div class="metric-val ${critCount>0?'bad':'ok'}">${critCount}C / ${warnCount}W</div><div class="metric-hint">Critical / Warning</div></div>
   `;
 
-  // Spend bar
   document.getElementById('spendBar').innerHTML=`
     <div class="spend-seg seg-b" style="width:${bPct}%;color:#fff;">${bPct>8?fmtP(bPct):''}</div>
     <div class="spend-seg seg-nb" style="width:${nbPct}%;color:#fff;">${nbPct>5?fmtP(nbPct):''}</div>
@@ -634,28 +556,11 @@ async function runAudit() {
 
   renderViolations(violations);
   renderCampaigns(bulkEnabled,brandName,activeCampaigns);
-  renderKeywords(null); // show loading state / fallback initially
+  renderKeywords();
   renderCompetitors();
   renderPlan(violations,bPct,nbPct,autoPct);
 
   document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
-
-  // If ASINs + API key provided, fetch AI keywords and re-render tab
-  if(useAI){
-    try{
-      const aiData=await fetchAIKeywords(asins,productLineNames,apiKey);
-      renderKeywords(aiData);
-    }catch(err){
-      console.error('AI keyword fetch failed:',err);
-      const el=document.getElementById('tab-keywords');
-      const errBar=document.createElement('div');
-      errBar.className='info-bar';
-      errBar.style.borderColor='rgba(224,82,82,0.3)';
-      errBar.style.background='rgba(224,82,82,0.06)';
-      errBar.innerHTML=`<b style="color:var(--red)">Keyword generation failed:</b> ${err.message}. Showing standard keyword targets below.`;
-      el.prepend(errBar);
-    }
-  }
 }
 
 // ─── VIOLATIONS ───────────────────────────────────────────────────────────────
@@ -688,13 +593,10 @@ function renderCampaigns(bulkEnabled,brandName,campData){
     const strat=c.bidStrat||'';
     const stratBadge=strat.toLowerCase().includes('fixed')?'badge-red':strat.toLowerCase().includes('up and down')?'badge-red':'badge-neutral';
     const stratLabel=strat.toLowerCase().includes('fixed')?'Fixed ⚠':strat.toLowerCase().includes('up and down')?'Up/Down ⚠':strat.toLowerCase().includes('down only')?'Down Only':'—';
-
-    // Spend from campData if available
     const cd=campData.find(x=>x.name===c.name);
     const spendCell=cd?fmt$(cd.spend):'—';
     const acosCell=cd&&cd.acos>0?fmtP(cd.acos):'—';
     const roasCell=cd&&cd.roas>0?cd.roas.toFixed(2)+'x':'—';
-
     return `<tr>
       <td class="td-name">${c.name}</td>
       <td><span class="badge ${typeBadge}">${type}</span></td>
@@ -705,8 +607,8 @@ function renderCampaigns(bulkEnabled,brandName,campData){
     </tr>`;
   }).join('');
 
-  const nbCount=list.filter(c=>!isBranded(c.name,brandName)&&!isAuto(c.name)).length;
-  const bCount=list.filter(c=>isBranded(c.name,brandName)&&!isAuto(c.name)).length;
+  const nbCount=list.filter(c=>!isBranded(c.name,brandName||'')&&!isAuto(c.name)).length;
+  const bCount=list.filter(c=>isBranded(c.name,brandName||'')&&!isAuto(c.name)).length;
   const aCount=list.filter(c=>isAuto(c.name)).length;
 
   el.innerHTML=`
@@ -724,87 +626,31 @@ function renderCampaigns(bulkEnabled,brandName,campData){
 }
 
 // ─── KEYWORDS ────────────────────────────────────────────────────────────────
-function renderKeywords(aiData){
+function renderKeywords(){
   const el=document.getElementById('tab-keywords');
-
-  // If no AI data yet and ASINs were provided, show loading
-  const asinRaw=document.getElementById('asinList').value.trim();
-  const apiKey=document.getElementById('apiKey').value.trim();
-  const useAI=asinRaw.length>0&&apiKey.length>0;
-
-  if(aiData===null&&useAI){
-    el.innerHTML=`
-      <div class="info-bar">Generating keyword recommendations from your ASINs…</div>
-      <div style="display:flex;align-items:center;gap:10px;padding:32px;color:var(--sub);font-size:13px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0">
-          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-        </svg>
-        Asking Claude to identify products and generate tailored keywords…
-      </div>`;
-    return;
-  }
-
-  // Build keyword sections — AI data takes priority, fallback to hardcoded
-  const colHead=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:90px">Match Type</div></div>`;
-
-  function kwRow(kw,match){
-    return `<div class="kw-row"><div class="kw-kw">${kw}</div><div class="kw-match">${match||''}</div></div>`;
-  }
+  const colHeadFull=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:72px;text-align:right">Volume</div><div style="width:58px;text-align:center">B. Share</div><div style="width:90px">Match Type</div></div>`;
+  const source=`<div class="info-bar"><b>Keyword targets</b> from SQP analysis. Brand Share = current % of category purchases on that query. To get ASIN-tailored keywords, paste your ASINs in chat — Claude will generate an updated version of this file.</div>`;
 
   let html='';
-  let source='';
-
-  if(aiData&&aiData.productLines&&aiData.productLines.length>0){
-    source=`<div class="info-bar"><b>AI-generated keywords</b> based on your ASINs. Tier 1 = high-volume generic terms; Tier 2 = eco/positioning terms specific to your product claims.</div>`;
-    aiData.productLines.forEach(pl=>{
-      const t1rows=(pl.t1||[]).map(k=>kwRow(k,'Phrase → Exact')).join('');
-      const t2rows=(pl.t2||[]).map(k=>kwRow(k,'Exact')).join('');
-      const t1text=(pl.t1||[]).join('\n');
-      const t2text=(pl.t2||[]).join('\n');
-      const asinBadges=(pl.asins||[]).map(a=>`<span class="badge badge-neutral" style="font-family:var(--mono);font-size:10px;">${a}</span>`).join('');
-      html+=`<div class="kw-section">
-        <div class="kw-section-head">
-          <div>
-            <div class="kw-section-title">${pl.name}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${asinBadges}</div>
-          </div>
+  Object.entries(KW_TARGETS).forEach(([pl,{t1,t2}])=>{
+    const t1rows=t1.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share===0?'share-zero':k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
+    const t2rows=t2.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
+    const t1text=t1.map(k=>k.kw).join('\n');
+    const t2text=t2.map(k=>k.kw).join('\n');
+    html+=`<div class="kw-section">
+      <div class="kw-section-head"><div class="kw-section-title">${pl}</div></div>
+      <div class="kw-two">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
+          ${colHeadFull}<div>${t1rows}</div>
         </div>
-        <div class="kw-two">
-          <div class="card">
-            <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
-            ${colHead}<div>${t1rows}</div>
-          </div>
-          <div class="card">
-            <div class="card-head"><div class="card-head-title" style="color:var(--green)">Tier 2 — Eco / Product Fit</div><button class="copy-btn" onclick="copyText(\`${t2text}\`,this)">Copy</button></div>
-            ${colHead}<div>${t2rows}</div>
-          </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title" style="color:var(--green)">Tier 2 — Eco / Brand Fit</div><button class="copy-btn" onclick="copyText(\`${t2text}\`,this)">Copy</button></div>
+          ${colHeadFull}<div>${t2rows}</div>
         </div>
-      </div>`;
-    });
-  } else {
-    // Fallback: hardcoded SQP data with volume + brand share columns
-    const colHeadFull=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:72px;text-align:right">Volume</div><div style="width:58px;text-align:center">B. Share</div><div style="width:90px">Match Type</div></div>`;
-    source=`<div class="info-bar"><b>Standard keyword targets</b> from SQP analysis (March 2026). Add ASINs and an API key above to get tailored recommendations. Brand Share = HoldOn's current % of category purchases on that query.</div>`;
-    Object.entries(KW_TARGETS).forEach(([pl,{t1,t2}])=>{
-      const t1rows=t1.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share===0?'share-zero':k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
-      const t2rows=t2.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
-      const t1text=t1.map(k=>k.kw).join('\n');
-      const t2text=t2.map(k=>k.kw).join('\n');
-      html+=`<div class="kw-section">
-        <div class="kw-section-head"><div class="kw-section-title">${pl}</div></div>
-        <div class="kw-two">
-          <div class="card">
-            <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
-            ${colHeadFull}<div>${t1rows}</div>
-          </div>
-          <div class="card">
-            <div class="card-head"><div class="card-head-title" style="color:var(--green)">Tier 2 — Eco / Brand Fit</div><button class="copy-btn" onclick="copyText(\`${t2text}\`,this)">Copy</button></div>
-            ${colHeadFull}<div>${t2rows}</div>
-          </div>
-        </div>
-      </div>`;
-    });
-  }
+      </div>
+    </div>`;
+  });
 
   el.innerHTML=source+html;
 }
@@ -819,17 +665,12 @@ function renderCompetitors(){
       <div class="comp-note">${note}</div>
     </div>
   `).join('');
-
-  el.innerHTML=`
-    <div class="comp-grid">${cards}</div>
-  `;
+  el.innerHTML=`<div class="comp-grid">${cards}</div>`;
 }
 
 // ─── 30/60/90 PLAN ────────────────────────────────────────────────────────────
 function renderPlan(violations,bPct,nbPct,autoPct){
   const el=document.getElementById('tab-plan');
-  const budgetFree=bPct>20?fmt$(Math.round((bPct-20)/100*(bPct/(bPct+nbPct+autoPct))*21894)):'$0';
-
   const phases=[
     {n:'01',title:'Stabilize',range:'Days 1–30',items:[
       {p:1,text:'Switch Fixed Bid campaigns → Dynamic bids – down only',impact:'ACOS protection'},
@@ -899,7 +740,6 @@ function copyText(text,btn){
   });
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
 document.getElementById('auditDate').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 </script>
 </body>
