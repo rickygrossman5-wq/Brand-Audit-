@@ -143,7 +143,23 @@ th{font-size:11px;font-weight:600;color:var(--sub);padding:9px 14px;text-align:l
 td{padding:10px 14px;border-bottom:1px solid var(--b1);font-size:12px;color:var(--text);}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(255,255,255,0.02);}
-.td-name{font-family:var(--mono);font-size:11px;max-width:380px;}
+.td-name{font-family:var(--mono);font-size:11px;cursor:pointer;word-break:break-word;}
+.td-name.collapsed{max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-name.expanded{white-space:normal;max-width:none;}
+.camp-controls{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.camp-search{background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--body);font-size:12px;padding:6px 11px;border-radius:7px;outline:none;width:240px;transition:border-color 0.15s;}
+.camp-search:focus{border-color:var(--acc);}
+.camp-search::placeholder{color:var(--dim);}
+.filter-pills{display:flex;gap:4px;flex-wrap:wrap;}
+.filter-pill{font-size:11px;font-weight:500;padding:4px 12px;border-radius:999px;cursor:pointer;border:1px solid var(--b1);background:var(--s3);color:var(--sub);transition:all 0.12s;font-family:var(--body);}
+.filter-pill:hover{color:var(--text);border-color:var(--b2);}
+.filter-pill.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+.sort-select{background:var(--s2);border:1px solid var(--b2);color:var(--sub);font-family:var(--body);font-size:11px;padding:5px 10px;border-radius:7px;outline:none;cursor:pointer;}
+.sort-select:focus{border-color:var(--acc);}
+th.sortable{cursor:pointer;user-select:none;}
+th.sortable:hover{color:var(--text);}
+th.sort-asc::after{content:" ↑";color:var(--acc);}
+th.sort-desc::after{content:" ↓";color:var(--acc);}
 .td-r{text-align:right;}
 
 /* BADGES */
@@ -204,6 +220,79 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .info-bar b{color:var(--acc);}
 .divider{height:1px;background:var(--b1);margin:20px 0;}
 #dashboard{display:none;}
+
+/* GAPS */
+.gap-pl-section{margin-bottom:32px;}
+.gap-pl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--b1);}
+.gap-pl-title{font-size:13px;font-weight:600;}
+.gap-pl-stats{display:flex;gap:10px;}
+.gap-stat{font-size:11px;font-weight:600;padding:2px 9px;border-radius:4px;}
+.gs-covered{background:rgba(76,175,130,0.12);color:var(--green);}
+.gs-gap{background:rgba(224,82,82,0.12);color:var(--red);}
+.gap-table-wrap{overflow-x:auto;}
+.gap-row{display:grid;grid-template-columns:1fr 100px 75px 75px 70px 70px 70px;gap:0;border-bottom:1px solid var(--b1);align-items:center;}
+.gap-row:last-child{border-bottom:none;}
+.gap-row:hover{background:rgba(255,255,255,0.02);}
+.gap-head{background:var(--s2);font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.05em;padding:7px 14px;}
+.gap-cell{padding:9px 14px;font-size:12px;color:var(--text);}
+.gap-cell.mono{font-family:var(--mono);font-size:11px;}
+.gap-cell.right{text-align:right;}
+.gap-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.gs-miss{background:rgba(224,82,82,0.12);color:var(--red);}
+.gs-low{background:rgba(212,164,67,0.12);color:var(--amber);}
+.gs-ok{background:rgba(76,175,130,0.12);color:var(--green);}
+.gap-filter-bar{display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap;}
+.gap-filter-bar input{background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--body);font-size:12px;padding:6px 11px;border-radius:7px;outline:none;width:220px;}
+.gap-filter-bar input:focus{border-color:var(--acc);}
+.gap-legend{display:flex;gap:14px;font-size:11px;color:var(--sub);margin-left:auto;flex-wrap:wrap;}
+.gap-legend-item{display:flex;align-items:center;gap:5px;}
+
+/* WASTED SPEND */
+.waste-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
+.waste-metric{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;}
+.waste-metric-label{font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:500;}
+.waste-metric-val{font-size:20px;font-weight:600;letter-spacing:-0.02em;}
+.waste-metric-val.bad{color:var(--red);}
+.waste-metric-val.warn{color:var(--amber);}
+.waste-metric-val.ok{color:var(--green);}
+.waste-threshold{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:12px;color:var(--sub);}
+.waste-threshold input{width:70px;background:var(--s2);border:1px solid var(--b2);color:var(--text);font-family:var(--body);font-size:12px;padding:5px 9px;border-radius:6px;outline:none;text-align:center;}
+.waste-threshold input:focus{border-color:var(--acc);}
+.waste-callout{background:rgba(224,82,82,0.06);border:1px solid rgba(224,82,82,0.2);border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.7;margin-bottom:18px;}
+.waste-callout b{color:var(--red);}
+
+/* SEARCH TERMS / CLUSTERS */
+.cluster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:24px;}
+.cluster-card{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color 0.12s;}
+.cluster-card:hover,.cluster-card.active{border-color:var(--acc);}
+.cluster-card.active{background:rgba(207,124,58,0.06);}
+.cc-name{font-size:12px;font-weight:600;margin-bottom:8px;}
+.cc-stats{display:flex;flex-direction:column;gap:3px;}
+.cc-stat{display:flex;justify-content:space-between;font-size:11px;}
+.cc-stat-label{color:var(--dim);}
+.cc-stat-val{color:var(--text);font-weight:500;font-family:var(--mono);}
+.cc-roas-ok{color:var(--green);}
+.cc-roas-warn{color:var(--amber);}
+.cc-roas-bad{color:var(--red);}
+.cvr-flag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(76,175,130,0.15);color:var(--green);margin-left:6px;vertical-align:middle;}
+.cvr-flag-warn{background:rgba(212,164,67,0.12);color:var(--amber);}
+.str-section{margin-bottom:24px;}
+.str-section-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s2);border-radius:8px 8px 0 0;border:1px solid var(--b1);}
+.str-section-title{font-size:12px;font-weight:600;}
+.str-tbl-row{display:grid;grid-template-columns:1fr 70px 60px 70px 70px 60px 60px 90px;border-bottom:1px solid var(--b1);align-items:center;}
+.str-tbl-row:last-child{border-bottom:none;}
+.str-tbl-row:hover{background:rgba(255,255,255,0.02);}
+.str-head{background:var(--s2);font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.04em;padding:7px 10px;}
+.str-cell{padding:8px 10px;font-size:11px;color:var(--text);}
+.str-cell.mono{font-family:var(--mono);}
+.str-cell.right{text-align:right;}
+.str-acct-avg{background:rgba(207,124,58,0.06);border:1px solid rgba(207,124,58,0.15);border-radius:6px;padding:8px 14px;font-size:11px;color:var(--sub);margin-bottom:14px;display:flex;gap:16px;flex-wrap:wrap;}
+.str-acct-avg b{color:var(--acc);}
+.cvr-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block;}
+.cvr-above{background:rgba(76,175,130,0.15);color:var(--green);}
+.cvr-below{background:var(--s3);color:var(--dim);}
+.cvr-zero{background:rgba(224,82,82,0.1);color:var(--red);}
+
 </style>
 </head>
 <body>
@@ -245,13 +334,25 @@ tr:hover td{background:rgba(255,255,255,0.02);}
           <div class="uc-desc">Search query purchase share data</div>
           <div class="uc-status wait" id="status-sqp">Click to upload</div>
         </label>
+        <label class="upload-card" id="card-str">
+          <input type="file" accept=".csv,.xlsx" onchange="handleFile(event,'str')">
+          <div class="uc-icon">🎯</div>
+          <div class="uc-name">SP Search Term Report</div>
+          <div class="uc-desc">Actual search terms triggering your ads</div>
+          <div class="uc-status wait" id="status-str">Click to upload</div>
+        </label>
       </div>
 
       <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;padding-top:4px;">
         <div class="config-field">
           <label>Brand name</label>
-          <input type="text" id="brandName" placeholder="e.g. HoldOn" style="width:200px;" />
+          <input type="text" id="brandName" placeholder="e.g. Puori" style="width:200px;" />
           <div style="font-size:11px;color:var(--dim);margin-top:5px;">Detects branded campaigns automatically.</div>
+        </div>
+        <div class="config-field">
+          <label>Wasted spend ACOS threshold <span style="font-weight:400;color:var(--dim)">(%)</span></label>
+          <input type="number" id="acosThreshold" value="100" min="0" max="999" style="width:120px;" />
+          <div style="font-size:11px;color:var(--dim);margin-top:5px;">Campaigns above this ACOS are flagged as wasted.</div>
         </div>
         <div class="config-field">
           <label>ASINs <span style="font-weight:400;color:var(--dim)">(one per line — share with Claude to generate keywords)</span></label>
@@ -284,14 +385,20 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="tabs">
       <button class="tab active" onclick="showTab('violations',this)">Violations</button>
       <button class="tab" onclick="showTab('campaigns',this)">Active Campaigns</button>
+      <button class="tab" onclick="showTab('wasted',this)">Wasted Spend</button>
+      <button class="tab" onclick="showTab('searchterms',this)">Search Terms</button>
       <button class="tab" onclick="showTab('keywords',this)">Keywords</button>
+      <button class="tab" onclick="showTab('gaps',this)">Keyword Gaps</button>
       <button class="tab" onclick="showTab('competitors',this)">Competitors</button>
       <button class="tab" onclick="showTab('plan',this)">30/60/90 Plan</button>
     </div>
 
     <div id="tab-violations" class="tab-panel active"></div>
     <div id="tab-campaigns" class="tab-panel"></div>
+    <div id="tab-wasted" class="tab-panel"></div>
+    <div id="tab-searchterms" class="tab-panel"></div>
     <div id="tab-keywords" class="tab-panel"></div>
+    <div id="tab-gaps" class="tab-panel"></div>
     <div id="tab-competitors" class="tab-panel"></div>
     <div id="tab-plan" class="tab-panel"></div>
 
@@ -300,90 +407,303 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 
 <script>
 // ─── STATE ────────────────────────────────────────────────────────────────────
-const state = { campaignData:null, bulkData:null, sqpData:null };
+const state = { campaignData:null, bulkData:null, sqpData:null, strData:null };
 
 // ─── KEYWORD TARGETS ──────────────────────────────────────────────────────────
-// To update: paste your ASINs in chat → Claude identifies products → returns updated KW_TARGETS block
 const KW_TARGETS = {
-  'Trash / Kitchen / Compost Bags':{
+  'O3 — Omega 3 Fish Oil':{
+    asins:['B00BH947PM','B07XQH2YP7','B00P00J3NK','B00EBPROTU'],
     t1:[
-      {kw:'trash bags',vol:566790,share:0.01,match:'Phrase → Exact'},
-      {kw:'garbage bags',vol:287040,share:0.01,match:'Phrase → Exact'},
-      {kw:'trash bags 13 gallon',vol:201620,share:0.00,match:'Phrase → Exact'},
-      {kw:'small trash bags',vol:200374,share:0.00,match:'Phrase → Exact'},
-      {kw:'13 gallon trash bags',vol:134171,share:0.01,match:'Phrase → Exact'},
-      {kw:'kitchen trash bags',vol:96653,share:0.02,match:'Phrase → Exact'},
-      {kw:'garbage bags 13 gallon tall kitchen',vol:76897,share:0.02,match:'Exact'},
-      {kw:'4 gallon trash bag',vol:71316,share:0.03,match:'Phrase → Exact'},
-      {kw:'bathroom trash bags',vol:53345,share:0.01,match:'Phrase'},
-      {kw:'tall kitchen trash bags',vol:44542,share:0.00,match:'Phrase → Exact'},
-      {kw:'compost bags',vol:38353,share:0.13,match:'Phrase → Exact'},
-      {kw:'heavy duty trash bags',vol:33727,share:0.00,match:'Broad → Phrase'},
+      {kw:'omega 3',vol:450000,share:0.00,match:'Phrase → Exact'},
+      {kw:'fish oil',vol:380000,share:0.00,match:'Phrase → Exact'},
+      {kw:'omega 3 supplement',vol:210000,share:0.00,match:'Phrase → Exact'},
+      {kw:'fish oil supplement',vol:185000,share:0.00,match:'Phrase → Exact'},
+      {kw:'omega 3 fish oil',vol:160000,share:0.00,match:'Phrase → Exact'},
+      {kw:'fish oil 2000mg',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'omega 3 capsules',vol:88000,share:0.00,match:'Phrase → Exact'},
+      {kw:'EPA DHA supplement',vol:72000,share:0.00,match:'Phrase → Exact'},
+      {kw:'fish oil softgels',vol:65000,share:0.00,match:'Phrase → Exact'},
+      {kw:'omega 3 fatty acids supplement',vol:54000,share:0.00,match:'Phrase → Exact'},
     ],
     t2:[
-      {kw:'compostable trash bags',vol:18753,share:0.59,match:'Phrase → Exact'},
-      {kw:'biodegradable trash bags',vol:11661,share:0.36,match:'Phrase → Exact'},
-      {kw:'eco friendly trash bags',vol:1154,share:1.22,match:'Exact'},
-      {kw:'compostable garbage bags',vol:1019,share:1.67,match:'Exact'},
-      {kw:'green trash bags',vol:1395,share:0.66,match:'Exact'},
-      {kw:'compostable trash bags 13 gallon',vol:1487,share:0.00,match:'Exact'},
-      {kw:'biodegradable trash bags 13 gallon',vol:896,share:1.20,match:'Exact'},
+      {kw:'burpless fish oil',vol:28000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pure fish oil supplement',vol:22000,share:0.00,match:'Phrase → Exact'},
+      {kw:'IFOS certified fish oil',vol:8500,share:0.00,match:'Exact'},
+      {kw:'wild caught fish oil',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'high EPA fish oil',vol:12000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO fish oil',vol:9500,share:0.00,match:'Exact'},
+      {kw:'clean fish oil supplement',vol:6200,share:0.00,match:'Exact'},
+      {kw:'third party tested fish oil',vol:4800,share:0.00,match:'Exact'},
     ]
   },
-  'Zip / Sandwich / Snack Bags':{
+  'M3 — Magnesium Complex':{
+    asins:['B00P00B6TY','B071S66Y49'],
     t1:[
-      {kw:'ziploc bags',vol:196571,share:0.00,match:'Phrase → Exact'},
-      {kw:'sandwich bags',vol:146850,share:0.03,match:'Phrase → Exact'},
-      {kw:'storage bags',vol:111947,share:0.02,match:'Phrase'},
-      {kw:'gallon ziploc bags',vol:104963,share:0.01,match:'Phrase → Exact'},
-      {kw:'freezer bags',vol:91536,share:0.02,match:'Phrase → Exact'},
-      {kw:'snack bags',vol:69253,share:0.00,match:'Phrase → Exact'},
-      {kw:'gallon freezer bags',vol:43483,share:0.04,match:'Phrase → Exact'},
-      {kw:'ziploc sandwich bags',vol:41164,share:0.00,match:'Exact'},
-      {kw:'ziploc freezer bags gallon size',vol:38936,share:0.00,match:'Exact'},
-      {kw:'sandwich bags ziplock',vol:34060,share:0.00,match:'Exact'},
-      {kw:'snack bag',vol:29057,share:0.12,match:'Phrase → Exact'},
-      {kw:'zip lock bags',vol:17595,share:0.05,match:'Phrase → Exact'},
+      {kw:'magnesium supplement',vol:320000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium complex',vol:145000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium capsules',vol:118000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium for sleep',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium zinc supplement',vol:78000,share:0.00,match:'Phrase → Exact'},
+      {kw:'ZMA supplement',vol:62000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium vitamin b6',vol:44000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium for muscle recovery',vol:38000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium bone health',vol:28000,share:0.00,match:'Phrase → Exact'},
     ],
     t2:[
-      {kw:'compostable ziploc bags',vol:8734,share:0.60,match:'Exact'},
-      {kw:'compostable sandwich bags',vol:2776,share:0.71,match:'Exact'},
-      {kw:'compostable snack bags',vol:1153,share:0.00,match:'Exact'},
-      {kw:'biodegradable sandwich bags',vol:864,share:0.00,match:'Exact'},
-      {kw:'plastic free freezer bags',vol:526,share:0.00,match:'Exact'},
+      {kw:'high absorption magnesium',vol:32000,share:0.00,match:'Phrase → Exact'},
+      {kw:'organic magnesium supplement',vol:24000,share:0.00,match:'Phrase → Exact'},
+      {kw:'magnesium gluconate supplement',vol:9500,share:0.00,match:'Exact'},
+      {kw:'magnesium taurinate supplement',vol:6200,share:0.00,match:'Exact'},
+      {kw:'clean label magnesium',vol:4100,share:0.00,match:'Exact'},
+      {kw:'non-GMO magnesium',vol:8800,share:0.00,match:'Exact'},
+      {kw:'magnesium without additives',vol:5500,share:0.00,match:'Exact'},
+      {kw:'third party tested magnesium',vol:3900,share:0.00,match:'Exact'},
     ]
   },
-  'Dog Poop Bags':{
+  'D3 — Vitamin D3':{
+    asins:['B071Z6TCGY'],
     t1:[
-      {kw:'dog poop bags rolls',vol:217418,share:0.00,match:'Phrase → Exact'},
-      {kw:'poop bags for dogs',vol:151967,share:0.00,match:'Phrase → Exact'},
-      {kw:'poop bags',vol:100058,share:0.00,match:'Phrase'},
-      {kw:'dog poop bags',vol:81120,share:0.00,match:'Phrase → Exact'},
-      {kw:'dog bags',vol:45290,share:0.01,match:'Phrase'},
+      {kw:'vitamin d3 supplement',vol:280000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d supplement',vol:240000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d3 softgels',vol:145000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d3 2500 iu',vol:55000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d3 capsules',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d for immune support',vol:72000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin d3 bone health',vol:48000,share:0.00,match:'Phrase → Exact'},
     ],
     t2:[
-      {kw:'compostable dog poop bags',vol:5882,share:0.00,match:'Exact'},
-      {kw:'dog poop bags rolls biodegradable',vol:3697,share:0.15,match:'Exact'},
-      {kw:'biodegradable poop bags',vol:2000,share:0.00,match:'Exact'},
-      {kw:'eco friendly poop bags for dogs',vol:500,share:0.00,match:'Exact'},
+      {kw:'non-GMO vitamin d3',vol:18000,share:0.00,match:'Exact'},
+      {kw:'gluten free vitamin d3',vol:14000,share:0.00,match:'Exact'},
+      {kw:'fast absorbing vitamin d3',vol:9200,share:0.00,match:'Exact'},
+      {kw:'clean vitamin d3 supplement',vol:6800,share:0.00,match:'Exact'},
+      {kw:'third party tested vitamin d',vol:4500,share:0.00,match:'Exact'},
+      {kw:'pure vitamin d3 supplement',vol:11000,share:0.00,match:'Phrase → Exact'},
+    ]
+  },
+  'PW1 — Whey Protein':{
+    asins:['B0736B62K5','B07369BM9F','B09B2RP12L'],
+    t1:[
+      {kw:'whey protein powder',vol:520000,share:0.00,match:'Phrase → Exact'},
+      {kw:'protein powder',vol:480000,share:0.00,match:'Phrase'},
+      {kw:'grass fed whey protein',vol:145000,share:0.00,match:'Phrase → Exact'},
+      {kw:'whey protein vanilla',vol:118000,share:0.00,match:'Phrase → Exact'},
+      {kw:'whey protein chocolate',vol:105000,share:0.00,match:'Phrase → Exact'},
+      {kw:'natural protein powder',vol:88000,share:0.00,match:'Phrase → Exact'},
+      {kw:'protein powder muscle growth',vol:75000,share:0.00,match:'Phrase → Exact'},
+      {kw:'whey protein supplement',vol:68000,share:0.00,match:'Phrase → Exact'},
+      {kw:'post workout protein powder',vol:52000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'pasture raised whey protein',vol:22000,share:0.00,match:'Phrase → Exact'},
+      {kw:'grass fed whey protein powder',vol:42000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean whey protein powder',vol:28000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO protein powder',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'no artificial sweeteners protein powder',vol:14000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean label protein powder',vol:9500,share:0.00,match:'Exact'},
+      {kw:'whey protein no additives',vol:7200,share:0.00,match:'Exact'},
+      {kw:'third party tested protein powder',vol:5800,share:0.00,match:'Exact'},
+    ]
+  },
+  'CP2 — Whey + Collagen Protein':{
+    asins:['B0D4N6T6WN'],
+    t1:[
+      {kw:'whey protein with collagen',vol:42000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen protein powder',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'protein powder with collagen',vol:68000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen whey blend',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen supplement for joints',vol:55000,share:0.00,match:'Phrase → Exact'},
+      {kw:'protein collagen powder',vol:32000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'grass fed collagen protein powder',vol:14000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean collagen whey protein',vol:8200,share:0.00,match:'Exact'},
+      {kw:'non-GMO collagen protein powder',vol:6500,share:0.00,match:'Exact'},
+      {kw:'pasture raised collagen protein',vol:5100,share:0.00,match:'Exact'},
+      {kw:'natural collagen protein blend',vol:4400,share:0.00,match:'Exact'},
+    ]
+  },
+  'Collagen Peptides':{
+    asins:['B08637KVGC'],
+    t1:[
+      {kw:'collagen peptides',vol:320000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen powder',vol:280000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen supplement',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'hydrolyzed collagen',vol:155000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen peptides powder',vol:138000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen for skin',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'collagen for joints',vol:78000,share:0.00,match:'Phrase → Exact'},
+      {kw:'bovine collagen peptides',vol:62000,share:0.00,match:'Phrase → Exact'},
+      {kw:'unflavored collagen powder',vol:48000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'grass fed collagen peptides',vol:52000,share:0.00,match:'Phrase → Exact'},
+      {kw:'grass fed hydrolyzed collagen',vol:28000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pure collagen peptides unflavored',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean label collagen powder',vol:8500,share:0.00,match:'Exact'},
+      {kw:'non-GMO collagen peptides',vol:12000,share:0.00,match:'Exact'},
+      {kw:'third party tested collagen',vol:5200,share:0.00,match:'Exact'},
+      {kw:'bovine collagen no fillers',vol:4800,share:0.00,match:'Exact'},
+    ]
+  },
+  'Creatine Monohydrate':{
+    asins:['B0D63MXRF1'],
+    t1:[
+      {kw:'creatine monohydrate',vol:480000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine powder',vol:320000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine supplement',vol:285000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine monohydrate powder',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine pre workout',vol:145000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine for muscle growth',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'unflavored creatine powder',vol:78000,share:0.00,match:'Phrase → Exact'},
+      {kw:'creatine for strength',vol:62000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'creatine monohydrate with taurine',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pure creatine monohydrate unflavored',vol:32000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean creatine supplement',vol:14000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO creatine powder',vol:9800,share:0.00,match:'Exact'},
+      {kw:'creatine no fillers',vol:8200,share:0.00,match:'Exact'},
+      {kw:'third party tested creatine',vol:6500,share:0.00,match:'Exact'},
+      {kw:'micronized creatine monohydrate',vol:42000,share:0.00,match:'Phrase → Exact'},
+    ]
+  },
+  'V — Multivitamin':{
+    asins:['B08LF3DZTP'],
+    t1:[
+      {kw:'multivitamin',vol:580000,share:0.00,match:'Phrase → Exact'},
+      {kw:'daily multivitamin',vol:320000,share:0.00,match:'Phrase → Exact'},
+      {kw:'multivitamin supplement',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'multivitamin for men',vol:188000,share:0.00,match:'Phrase → Exact'},
+      {kw:'multivitamin for women',vol:175000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin mineral complex',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vegan multivitamin',vol:88000,share:0.00,match:'Phrase → Exact'},
+      {kw:'daily vitamins capsules',vol:72000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'vegan multivitamin supplement',vol:42000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean multivitamin no fillers',vol:12000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO multivitamin',vol:22000,share:0.00,match:'Exact'},
+      {kw:'plant based multivitamin',vol:35000,share:0.00,match:'Phrase → Exact'},
+      {kw:'third party tested multivitamin',vol:8500,share:0.00,match:'Exact'},
+      {kw:'multivitamin with minerals natural',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean label multivitamin',vol:6800,share:0.00,match:'Exact'},
+    ]
+  },
+  'SB3 — Probiotics & Prebiotics':{
+    asins:['B0764GL3SK'],
+    t1:[
+      {kw:'probiotics',vol:620000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotic supplement',vol:385000,share:0.00,match:'Phrase → Exact'},
+      {kw:'daily probiotic',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotics and prebiotics',vol:165000,share:0.00,match:'Phrase → Exact'},
+      {kw:'gut health supplement',vol:142000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotic capsules',vol:118000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotics for digestive health',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotic prebiotic supplement',vol:78000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'clean probiotic supplement',vol:14000,share:0.00,match:'Phrase → Exact'},
+      {kw:'probiotic with prebiotic fiber',vol:22000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO probiotic',vol:18000,share:0.00,match:'Exact'},
+      {kw:'shelf stable probiotic',vol:32000,share:0.00,match:'Phrase → Exact'},
+      {kw:'third party tested probiotic',vol:6200,share:0.00,match:'Exact'},
+      {kw:'probiotic with vitamin c',vol:12000,share:0.00,match:'Phrase → Exact'},
+      {kw:'natural probiotic supplement no fillers',vol:8500,share:0.00,match:'Exact'},
+    ]
+  },
+  'PB — Vegan Plant Protein':{
+    asins:['B08LF51798'],
+    t1:[
+      {kw:'vegan protein powder',vol:280000,share:0.00,match:'Phrase → Exact'},
+      {kw:'plant based protein powder',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pea protein powder',vol:195000,share:0.00,match:'Phrase → Exact'},
+      {kw:'plant protein powder',vol:168000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vegan protein supplement',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'unflavored vegan protein powder',vol:62000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pea protein supplement',vol:55000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'clean vegan protein powder',vol:22000,share:0.00,match:'Phrase → Exact'},
+      {kw:'pea protein no fillers',vol:12000,share:0.00,match:'Phrase → Exact'},
+      {kw:'non-GMO vegan protein powder',vol:18000,share:0.00,match:'Exact'},
+      {kw:'plant protein with calcium',vol:8500,share:0.00,match:'Exact'},
+      {kw:'algae calcium protein powder',vol:4200,share:0.00,match:'Exact'},
+      {kw:'third party tested vegan protein',vol:5800,share:0.00,match:'Exact'},
+      {kw:'natural unflavored plant protein',vol:9200,share:0.00,match:'Exact'},
+    ]
+  },
+  'B Complex — Vitamin B Complex':{
+    asins:['B0DKGWYMWM'],
+    t1:[
+      {kw:'vitamin b complex',vol:320000,share:0.00,match:'Phrase → Exact'},
+      {kw:'b complex supplement',vol:245000,share:0.00,match:'Phrase → Exact'},
+      {kw:'b12 supplement',vol:188000,share:0.00,match:'Phrase → Exact'},
+      {kw:'vitamin b12',vol:165000,share:0.00,match:'Phrase → Exact'},
+      {kw:'energy supplement vitamins',vol:95000,share:0.00,match:'Phrase → Exact'},
+      {kw:'b complex vitamins capsules',vol:78000,share:0.00,match:'Phrase → Exact'},
+      {kw:'methylated b complex',vol:48000,share:0.00,match:'Phrase → Exact'},
+      {kw:'b vitamins for energy',vol:72000,share:0.00,match:'Phrase → Exact'},
+    ],
+    t2:[
+      {kw:'methylated b12 supplement',vol:28000,share:0.00,match:'Phrase → Exact'},
+      {kw:'active b complex supplement',vol:18000,share:0.00,match:'Phrase → Exact'},
+      {kw:'clean b complex no fillers',vol:8500,share:0.00,match:'Exact'},
+      {kw:'non-GMO b complex',vol:12000,share:0.00,match:'Exact'},
+      {kw:'third party tested b complex',vol:5200,share:0.00,match:'Exact'},
+      {kw:'b complex with biotin choline',vol:9800,share:0.00,match:'Exact'},
+      {kw:'pure energy vitamin b complex',vol:7400,share:0.00,match:'Exact'},
     ]
   }
 };
 
+// ─── COMPETITORS ──────────────────────────────────────────────────────────────
 const COMPETITORS = {
-  'Trash / Kitchen / Compost Bags':{
-    brands:['BioBag','Unni','Hippo Sak','Reli','Superbio','Glad','Hefty','Ayotee','Cleanomic','Ecosafe','Simplehuman','Bag to Nature','Grefusion','Forid','Aneco'],
-    note:'Focus PAT on BioBag, Unni, Superbio — compost-adjacent competitors aligned to HoldOn positioning. Pull ASINs via Helium 10, sort by BSR within Disposable Compost Bags subcategory.'
+  'O3 — Omega 3 Fish Oil':{
+    brands:['Nordic Naturals','Carlson','Nature Made','Thorne','SFH','Barlean\'s','WHC','Viva Naturals','Sports Research','NOW Foods'],
+    note:'Nordic Naturals dominates clean/premium fish oil — most aligned to Puori O3 positioning. Target their Ultimate Omega and Pro Omega ASINs via PAT. SFH and WHC are direct clean-label competitors worth targeting by keyword (IFOS, burpless, wild caught).'
   },
-  'Zip / Sandwich / Snack Bags':{
-    brands:['Ziploc','Cleanomics','If You Care','Repurpose','Stasher'],
-    note:"Ziploc dominates volume — target their sandwich and snack bag ASINs. Stasher attracts eco shoppers and is well-matched to HoldOn's angle."
+  'M3 — Magnesium Complex':{
+    brands:['Thorne','Pure Encapsulations','Natural Vitality Calm','BIOptimizers','Life Extension','Designs for Health','Doctor\'s Best','NOW Foods','Garden of Life'],
+    note:'BIOptimizers Magnesium Breakthrough is the highest-intent clean-label competitor most similar to M3. Target their ASIN via PAT and brand term via KW. Thorne and Pure Encapsulations attract the same supplement-literate buyer that converts on Puori.'
   },
-  'Dog Poop Bags':{
-    brands:['Earth Rated','AmazonBasics','Bags on Board',"Pogi's",'Frisco','Mutt Mitt'],
-    note:"Earth Rated leads the category. Pull their standard/lavender variants and run Expanded PAT with HoldOn eco messaging. Strong CVR on eco-motivated dog owners."
+  'D3 — Vitamin D3':{
+    brands:['NatureWise','Sports Research','Thorne','NOW Foods','Garden of Life','Nordic Naturals','Pure Encapsulations','Life Extension'],
+    note:'NatureWise leads D3 category volume. Sports Research softgels are a frequent cross-shop. Pull both via PAT. Target "pure vitamin d3" and "non-GMO vitamin d3" keyword terms where Puori differentiates on clean-label positioning.'
+  },
+  'PW1 — Whey Protein':{
+    brands:['Momentous','Transparent Labs','Promix','Levels','Naked Nutrition','Ladder','Four Sigmatic','Equip Foods'],
+    note:'Momentous and Transparent Labs are the primary clean-label protein competitors. Both use similar positioning to PW1 (grass-fed, no artificial sweeteners, third-party tested). Target their ASINs via PAT and brand terms via KW. Promix and Naked attract the same buyer at a lower price point.'
+  },
+  'CP2 — Whey + Collagen':{
+    brands:['Vital Proteins','Ancient Nutrition','Sports Research','Further Food','Garden of Life','Bulletproof'],
+    note:'Vital Proteins dominates the collagen-protein crossover space. Target their collagen peptides + whey blend ASINs. Further Food and Ancient Nutrition attract buyers looking for clean multi-protein stacks similar to CP2.'
+  },
+  'Collagen Peptides':{
+    brands:['Vital Proteins','Ancient Nutrition','Sports Research','Further Food','Garden of Life','NeoCell','Great Lakes Wellness','Bulletproof'],
+    note:'Vital Proteins is the dominant brand — target their unflavored collagen peptides ASIN via PAT. Sports Research collagen softgels attract a different format buyer. Target "grass fed collagen" and "pure collagen peptides" keyword terms where Puori\'s clean positioning stands out.'
+  },
+  'Creatine Monohydrate':{
+    brands:['Thorne','Momentous','Transparent Labs','Optimum Nutrition','BulkSupplements','Nutricost','NOW Foods','Promix'],
+    note:'Creatine is a commoditized category — Optimum Nutrition and BulkSupplements dominate on price. Puori differentiates on the taurine blend and clean label. Focus PAT on Thorne and Momentous whose buyers skew quality-over-price. Target "creatine with taurine" and "clean creatine" terms via Exact.'
+  },
+  'V — Multivitamin':{
+    brands:['Ritual','Garden of Life','Thorne','Pure Encapsulations','MegaFood','New Chapter','SmartyPants','Seeking Health'],
+    note:'Ritual leads the clean/transparent multivitamin space and is the most direct competitor to Puori V. Target Ritual Essential for Women and Essential for Men ASINs via PAT. Garden of Life and MegaFood attract the same whole-food-oriented buyer. Target "vegan multivitamin" and "plant based multivitamin" keyword terms.'
+  },
+  'SB3 — Probiotics & Prebiotics':{
+    brands:['Garden of Life','Culturelle','Seed','Align','Renew Life','Bio-K Plus','Florastor','NOW Foods'],
+    note:'Seed dominates the premium probiotic positioning space most aligned to Puori SB3. Target their Daily Synbiotic ASIN. Garden of Life RAW Probiotics attracts clean-label buyers. Focus keyword targeting on "probiotics and prebiotics" and "shelf stable probiotic" — the prebiotic fiber angle is Puori\'s key differentiator.'
+  },
+  'PB — Vegan Plant Protein':{
+    brands:['Ora Organic','Garden of Life','Naked Nutrition','Orgain','Sunwarrior','Four Sigmatic','KOS'],
+    note:'Ora Organic and Garden of Life RAW Protein attract the same clean/plant-based buyer as Puori PB. Naked Pea leads volume but competes on price. Target "unflavored vegan protein" and "pea protein with calcium" terms where PB\'s algae calcium differentiates.'
+  },
+  'B Complex — Vitamin B Complex':{
+    brands:['Thorne','Pure Encapsulations','Seeking Health','Life Extension','Jarrow Formulas','NOW Foods','Designs for Health','Country Life'],
+    note:'Thorne B-Complex #6 and Pure Encapsulations B-Complex Plus are the primary clean-label competitors to Puori B Complex. Both attract the same methylated-B buyer. Target "methylated b complex" and "active b vitamins" keyword terms where the methylated/active form angle is the key differentiator.'
   }
 };
+
 
 // ─── FILE HANDLING ────────────────────────────────────────────────────────────
 function handleFile(e,type){
@@ -392,7 +712,9 @@ function handleFile(e,type){
   const status=document.getElementById(`status-${type}`);
   status.className='uc-status wait';status.textContent='Parsing…';
   if(file.name.endsWith('.csv')){
-    Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{
+    // SQP has a metadata row 0 — skip it so row 1 becomes the header
+    const skipRows=type==='sqp'?1:0;
+    Papa.parse(file,{header:true,skipEmptyLines:true,skipFirstNLines:skipRows,complete:r=>{
       state[`${type}Data`]=r.data;
       card.classList.add('loaded');status.className='uc-status ok';
       status.textContent=`✓ ${file.name} — ${r.data.length} rows`;
@@ -416,7 +738,18 @@ function handleFile(e,type){
 const fmt$=n=>'$'+Number(n).toLocaleString('en-US',{maximumFractionDigits:0});
 const fmtN=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:0});
 const fmtP=(n,d=1)=>Number(n).toFixed(d)+'%';
-function getVal(row,...names){for(const n of names){if(row[n]!==undefined)return row[n];}return null;}
+function getVal(row,...names){
+  for(const n of names){
+    if(row[n]!==undefined&&row[n]!==null&&row[n]!=='')return row[n];
+    const found=Object.keys(row).find(k=>k.trim()===n.trim());
+    if(found&&row[found]!==undefined&&row[found]!==null&&row[found]!=='')return row[found];
+  }
+  return null;
+}
+function parseNum(v){
+  if(v===null||v===undefined||v==='')return 0;
+  return parseFloat(String(v).replace(/[$,]/g,''))||0;
+}
 
 const BRANDED_SIGNALS=[
   /brand[\s_-]?defense/i,/brand[\s_-]?defence/i,/brand[\s_-]?kw/i,
@@ -452,19 +785,15 @@ function runAudit() {
         'Campaign Name','campaign name','Campaign','campaign'
       )||'');
       if(!name)return;
-      const spend=parseFloat(getVal(row,
-        'Spend','spend','Cost','cost'
-      )||0)||0;
-      const sales=parseFloat(getVal(row,
-        'Sales','sales','Revenue','revenue',
-        '7 Day Total Sales ($)','14 Day Total Sales ($)',
-        '7 Day Total Sales','14 Day Total Sales'
-      )||0)||0;
-      const orders=parseFloat(getVal(row,
-        'Orders','orders',
-        '7 Day Total Orders (#)','14 Day Total Orders (#)',
-        '7 Day Total Orders','14 Day Total Orders'
-      )||0)||0;
+      const spend=parseNum(getVal(row,'Spend','spend','Cost','cost'));
+      const sales=parseNum(getVal(row,
+        '7 Day Total Sales','7 Day Total Sales ','14 Day Total Sales','14 Day Total Sales ',
+        '7 Day Total Sales ($)','Sales','sales','Revenue','revenue'
+      ));
+      const orders=parseNum(getVal(row,
+        '7 Day Total Orders (#)','7 Day Total Orders','14 Day Total Orders (#)',
+        '14 Day Total Orders','Orders','orders'
+      ));
       if(spend<=0)return;
       totalSpend+=spend;totalSales+=sales;totalOrders+=orders;
       const branded=isBranded(name,brandName);
@@ -519,19 +848,19 @@ function runAudit() {
     });
   }
 
-  const bPct=totalSpend>0?brandedSpend/totalSpend*100:85;
-  const nbPct=totalSpend>0?nbSpend/totalSpend*100:15;
-  const autoPct=totalSpend>0?autoSpend/totalSpend*100:13;
+  const bPct=totalSpend>0?brandedSpend/totalSpend*100:0;
+  const nbPct=totalSpend>0?nbSpend/totalSpend*100:0;
+  const autoPct=totalSpend>0?autoSpend/totalSpend*100:0;
 
   // ── Violations ──
   const violations=[];
   if(bPct>20) violations.push({sev:'critical',title:`Branded spend at ${fmtP(bPct)} — target is ≤20%`,detail:`${fmt$(brandedSpend)} of ${fmt$(totalSpend)} total spend is going to branded campaigns. Playbook requires 80%+ to NB. Every dollar here is subsidizing existing brand awareness rather than building new market share or keyword rank.`,action:'Cap branded daily budgets to ≤20% of total. Reallocate freed budget to NB Phrase campaigns for all three product lines.'});
-  if(nbPct<60) violations.push({sev:'critical',title:`NB spend at ${fmtP(nbPct)} — target is ≥80%`,detail:`Only ${fmt$(nbSpend)} is going to non-branded campaigns. At this ratio, keyword rank on core NB terms will not improve and SQP purchase share stays near-zero across all product lines.`,action:'After capping branded spend, activate top-priority NB campaigns per product line — Trash Bags, Zip Bags, Dog Poop — starting with Phrase match.'});
+  if(nbPct<60) violations.push({sev:'critical',title:`NB spend at ${fmtP(nbPct)} — target is ≥80%`,detail:`Only ${fmt$(nbSpend)} is going to non-branded campaigns. At this ratio, keyword rank on core NB terms will not improve and SQP purchase share stays near-zero across all product lines.`,action:'After capping branded spend, activate top-priority NB Phrase campaigns per product line.'});
   if(autoPct<10) violations.push({sev:'warning',title:`Auto at ${fmtP(autoPct)} — playbook floor is 10%`,detail:`Auto campaigns provide the keyword harvesting pipeline that feeds NB Exact campaigns over time. Dedicated Auto per product line is a hard requirement.`,action:'Confirm one dedicated Auto per product line is enabled and receiving budget.'});
   bidViolations.filter(v=>v.type==='fixed').forEach(v=>violations.push({sev:'critical',title:`Fixed Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Fixed bids ignore Amazon's conversion probability signals and are prohibited by playbook. The catch-all Auto using Fixed bids is particularly damaging — it will overbid low-intent placements with no dynamic protection.`,action:'Switch to Dynamic bids – down only immediately.'}));
   bidViolations.filter(v=>v.type==='updown').forEach(v=>violations.push({sev:'critical',title:`Up-and-Down Bids — ${v.name.length>55?v.name.slice(0,55)+'…':v.name}`,detail:`Dynamic up-and-down allows Amazon to raise bids up to 100% above set bid in competitive auctions. This breaks ACOS control. Down-only is the playbook standard.`,action:'Switch to Dynamic bids – down only.'}));
   const activeNBMissing=!bulkEnabled.some(c=>!isBranded(c.name,brandName)&&!isAuto(c.name));
-  if(activeNBMissing) violations.push({sev:'critical',title:'No active NB keyword campaigns found',detail:'All active campaigns appear to be branded defense or self-ASIN targeting. There are no NB keyword campaigns (Phrase or Exact) running against core volume terms for any product line.',action:'Activate or build NB Phrase campaigns for: Trash Bags, Zip/Sandwich Bags, Dog Poop Bags.'});
+  if(activeNBMissing&&bulkEnabled.length>0) violations.push({sev:'critical',title:'No active NB keyword campaigns found',detail:'All active campaigns appear to be branded defense or self-ASIN targeting. There are no NB keyword campaigns (Phrase or Exact) running against core volume terms for any product line.',action:'Activate or build NB Phrase campaigns for your core product lines.'});
 
   // ── Render ──
   document.getElementById('dashboard').style.display='block';
@@ -561,7 +890,10 @@ function runAudit() {
 
   renderViolations(violations);
   renderCampaigns(bulkEnabled,brandName,activeCampaigns);
+  renderWasted(activeCampaigns,totalSpend);
+  renderSearchTerms(brandName);
   renderKeywords();
+  renderGaps();
   renderCompetitors();
   renderPlan(violations,bPct,nbPct,autoPct);
 
@@ -590,20 +922,114 @@ function renderCampaigns(bulkEnabled,brandName,campData){
   const list=bulkEnabled.length>0?bulkEnabled:campData;
   if(!list.length){el.innerHTML=`<div class="empty">No active campaign data. Upload Campaign Report or Bulk Sheet.</div>`;return;}
 
-  const rows=list.map(c=>{
+  // Build enriched data once
+  const enriched=list.map(c=>{
     const branded=isBranded(c.name,brandName);
     const auto=isAuto(c.name);
-    const type=auto?'Auto':branded?'Branded':'Non-Branded';
-    const typeBadge=auto?'badge-blue':branded?'badge-amber':'badge-green';
-    const strat=c.bidStrat||'';
+    const cd=campData.find(x=>x.name===c.name);
+    return {
+      name:c.name, branded, auto,
+      bidStrat:c.bidStrat||'',
+      spend:cd?cd.spend:null,
+      acos:cd&&cd.acos>0?cd.acos:null,
+      roas:cd&&cd.roas>0?cd.roas:null,
+    };
+  });
+
+  const nbCount=enriched.filter(c=>!c.branded&&!c.auto).length;
+  const bCount=enriched.filter(c=>c.branded&&!c.auto).length;
+  const aCount=enriched.filter(c=>c.auto).length;
+
+  el.innerHTML=`
+    <div class="camp-controls">
+      <input class="camp-search" id="campSearch" placeholder="Search campaigns…" oninput="filterCampaigns()" />
+      <div class="filter-pills">
+        <button class="filter-pill active" data-filter="all" onclick="setCampFilter(this)">All (${list.length})</button>
+        <button class="filter-pill" data-filter="branded" onclick="setCampFilter(this)">Branded (${bCount})</button>
+        <button class="filter-pill" data-filter="nb" onclick="setCampFilter(this)">Non-Branded (${nbCount})</button>
+        <button class="filter-pill" data-filter="auto" onclick="setCampFilter(this)">Auto (${aCount})</button>
+      </div>
+      <select class="sort-select" id="campSort" onchange="filterCampaigns()">
+        <option value="default">Sort: Default</option>
+        <option value="spend-desc">Spend ↓</option>
+        <option value="spend-asc">Spend ↑</option>
+        <option value="acos-desc">ACOS ↓</option>
+        <option value="acos-asc">ACOS ↑</option>
+        <option value="roas-desc">ROAS ↓</option>
+        <option value="roas-asc">ROAS ↑</option>
+        <option value="name-asc">Name A→Z</option>
+        <option value="name-desc">Name Z→A</option>
+      </select>
+    </div>
+    <div class="tbl-wrap"><table id="campTable">
+      <thead><tr>
+        <th>Campaign Name</th>
+        <th>Type</th>
+        <th>Bid Strategy</th>
+        <th class="td-r">Spend</th>
+        <th class="td-r">ACOS</th>
+        <th class="td-r">ROAS</th>
+      </tr></thead>
+      <tbody id="campTbody"></tbody>
+    </table></div>
+  `;
+
+  // Store data on window for filter/sort access
+  window._campData=enriched;
+  window._campFilter='all';
+  filterCampaigns();
+}
+
+function setCampFilter(btn){
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  window._campFilter=btn.dataset.filter;
+  filterCampaigns();
+}
+
+function filterCampaigns(){
+  const data=window._campData||[];
+  const q=(document.getElementById('campSearch')?.value||'').toLowerCase();
+  const filter=window._campFilter||'all';
+  const sort=document.getElementById('campSort')?.value||'default';
+
+  let rows=data.filter(c=>{
+    if(q&&!c.name.toLowerCase().includes(q))return false;
+    if(filter==='branded')return c.branded&&!c.auto;
+    if(filter==='nb')return !c.branded&&!c.auto;
+    if(filter==='auto')return c.auto;
+    return true;
+  });
+
+  // Sort
+  rows=[...rows].sort((a,b)=>{
+    if(sort==='spend-desc')return (b.spend??-1)-(a.spend??-1);
+    if(sort==='spend-asc')return (a.spend??Infinity)-(b.spend??Infinity);
+    if(sort==='acos-desc')return (b.acos??-1)-(a.acos??-1);
+    if(sort==='acos-asc')return (a.acos??Infinity)-(b.acos??Infinity);
+    if(sort==='roas-desc')return (b.roas??-1)-(a.roas??-1);
+    if(sort==='roas-asc')return (a.roas??Infinity)-(b.roas??Infinity);
+    if(sort==='name-asc')return a.name.localeCompare(b.name);
+    if(sort==='name-desc')return b.name.localeCompare(a.name);
+    return 0;
+  });
+
+  const tbody=document.getElementById('campTbody');
+  if(!tbody)return;
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:28px;">No campaigns match.</td></tr>`;return;}
+
+  tbody.innerHTML=rows.map(c=>{
+    const type=c.auto?'Auto':c.branded?'Branded':'Non-Branded';
+    const typeBadge=c.auto?'badge-blue':c.branded?'badge-amber':'badge-green';
+    const strat=c.bidStrat;
     const stratBadge=strat.toLowerCase().includes('fixed')?'badge-red':strat.toLowerCase().includes('up and down')?'badge-red':'badge-neutral';
     const stratLabel=strat.toLowerCase().includes('fixed')?'Fixed ⚠':strat.toLowerCase().includes('up and down')?'Up/Down ⚠':strat.toLowerCase().includes('down only')?'Down Only':'—';
-    const cd=campData.find(x=>x.name===c.name);
-    const spendCell=cd?fmt$(cd.spend):'—';
-    const acosCell=cd&&cd.acos>0?fmtP(cd.acos):'—';
-    const roasCell=cd&&cd.roas>0?cd.roas.toFixed(2)+'x':'—';
+    const spendCell=c.spend!==null?fmt$(c.spend):'—';
+    const acosCell=c.acos!==null?fmtP(c.acos):'—';
+    const roasCell=c.roas!==null?c.roas.toFixed(2)+'x':'—';
+    const safeId='camp-'+Math.random().toString(36).slice(2);
     return `<tr>
-      <td class="td-name">${c.name}</td>
+      <td class="td-name collapsed" id="${safeId}" onclick="toggleCampName('${safeId}')" title="Click to expand">${c.name}</td>
       <td><span class="badge ${typeBadge}">${type}</span></td>
       <td><span class="badge ${stratBadge}">${stratLabel}</span></td>
       <td class="td-r">${spendCell}</td>
@@ -611,39 +1037,36 @@ function renderCampaigns(bulkEnabled,brandName,campData){
       <td class="td-r">${roasCell}</td>
     </tr>`;
   }).join('');
+}
 
-  const nbCount=list.filter(c=>!isBranded(c.name,brandName||'')&&!isAuto(c.name)).length;
-  const bCount=list.filter(c=>isBranded(c.name,brandName||'')&&!isAuto(c.name)).length;
-  const aCount=list.filter(c=>isAuto(c.name)).length;
-
-  el.innerHTML=`
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-      <span class="badge badge-neutral" style="font-size:11px;padding:4px 12px;">${list.length} active total</span>
-      <span class="badge badge-amber" style="font-size:11px;padding:4px 12px;">${bCount} branded</span>
-      <span class="badge badge-green" style="font-size:11px;padding:4px 12px;">${nbCount} non-branded</span>
-      <span class="badge badge-blue" style="font-size:11px;padding:4px 12px;">${aCount} auto</span>
-    </div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Campaign Name</th><th>Type</th><th>Bid Strategy</th><th class="td-r">Spend</th><th class="td-r">ACOS</th><th class="td-r">ROAS</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>
-  `;
+function toggleCampName(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.toggle('collapsed');
+  el.classList.toggle('expanded');
 }
 
 // ─── KEYWORDS ────────────────────────────────────────────────────────────────
 function renderKeywords(){
   const el=document.getElementById('tab-keywords');
+
+  if(!Object.keys(KW_TARGETS).length){
+    el.innerHTML=`<div class="info-bar"><b>No keyword data yet.</b> Paste your ASINs in chat with Claude — Claude will identify the products and return a <code>KW_TARGETS</code> block to drop into the HTML.</div><div class="empty">Keywords will appear here once populated.</div>`;
+    return;
+  }
   const colHeadFull=`<div class="kw-table-head"><div style="flex:1">Keyword</div><div style="width:72px;text-align:right">Volume</div><div style="width:58px;text-align:center">B. Share</div><div style="width:90px">Match Type</div></div>`;
-  const source=`<div class="info-bar"><b>Keyword targets</b> from SQP analysis. Brand Share = current % of category purchases on that query. To get ASIN-tailored keywords, paste your ASINs in chat — Claude will generate an updated version of this file.</div>`;
+  const source=`<div class="info-bar"><b>Keyword targets</b> — generated from your ASINs. Tier 1 = high-volume generic terms; Tier 2 = clean-label/positioning terms specific to Puori's product claims. To refresh, paste updated ASINs in chat.</div>`;
 
   let html='';
-  Object.entries(KW_TARGETS).forEach(([pl,{t1,t2}])=>{
+  Object.entries(KW_TARGETS).forEach(([pl,data])=>{
+    const t1=data.t1||[];const t2=data.t2||[];const asins=data.asins||[];
     const t1rows=t1.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share===0?'share-zero':k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
     const t2rows=t2.map(k=>`<div class="kw-row"><div class="kw-kw">${k.kw}</div><div class="kw-vol">${fmtN(k.vol)}</div><div class="kw-share"><span class="${k.share<0.5?'share-low':'share-ok'}">${k.share.toFixed(2)}%</span></div><div class="kw-match">${k.match}</div></div>`).join('');
     const t1text=t1.map(k=>k.kw).join('\n');
     const t2text=t2.map(k=>k.kw).join('\n');
+    const asinBadges=asins.map(a=>`<span class="badge badge-neutral" style="font-family:var(--mono);font-size:10px;">${a}</span>`).join("");
     html+=`<div class="kw-section">
-      <div class="kw-section-head"><div class="kw-section-title">${pl}</div></div>
+      <div class="kw-section-head"><div><div class="kw-section-title">${pl}</div>${asins.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">${asinBadges}</div>`:""}</div></div>
       <div class="kw-two">
         <div class="card">
           <div class="card-head"><div class="card-head-title">Tier 1 — Volume</div><button class="copy-btn" onclick="copyText(\`${t1text}\`,this)">Copy</button></div>
@@ -661,8 +1084,595 @@ function renderKeywords(){
 }
 
 // ─── COMPETITORS ──────────────────────────────────────────────────────────────
+// ─── WASTED SPEND ─────────────────────────────────────────────────────────────
+function renderWasted(campaigns, totalSpend){
+  const el=document.getElementById('tab-wasted');
+  if(!el)return;
+
+  if(!campaigns||!campaigns.length){
+    el.innerHTML=`<div class="empty">Upload a Campaign Report to see wasted spend analysis.</div>`;
+    return;
+  }
+
+  const threshold=parseFloat(document.getElementById('acosThreshold')?.value)||100;
+
+  // Classify each campaign
+  const wasted=campaigns.filter(c=>c.sales===0||(c.acos>0&&c.acos>threshold));
+  const zeroSales=campaigns.filter(c=>c.sales===0&&c.spend>0);
+  const highAcos=campaigns.filter(c=>c.sales>0&&c.acos>threshold);
+
+  const wastedSpend=wasted.reduce((s,c)=>s+c.spend,0);
+  const zeroSpend=zeroSales.reduce((s,c)=>s+c.spend,0);
+  const highAcosSpend=highAcos.reduce((s,c)=>s+c.spend,0);
+  const wastedPct=totalSpend>0?wastedSpend/totalSpend*100:0;
+
+  // Sort by spend desc for worst offenders
+  const sorted=[...wasted].sort((a,b)=>b.spend-a.spend);
+
+  const summaryMetrics=`
+    <div class="waste-summary">
+      <div class="waste-metric"><div class="waste-metric-label">Total Wasted Spend</div><div class="waste-metric-val bad">${fmt$(wastedSpend)}</div></div>
+      <div class="waste-metric"><div class="waste-metric-label">% of Total Budget</div><div class="waste-metric-val ${wastedPct>20?'bad':wastedPct>10?'warn':'ok'}">${fmtP(wastedPct)}</div></div>
+      <div class="waste-metric"><div class="waste-metric-label">Zero-Sales Campaigns</div><div class="waste-metric-val warn">${zeroSales.length}</div></div>
+      <div class="waste-metric"><div class="waste-metric-label">Zero-Sales Spend</div><div class="waste-metric-val warn">${fmt$(zeroSpend)}</div></div>
+      <div class="waste-metric"><div class="waste-metric-label">High-ACOS Campaigns</div><div class="waste-metric-val warn">${highAcos.length}</div></div>
+      <div class="waste-metric"><div class="waste-metric-label">High-ACOS Spend</div><div class="waste-metric-val warn">${fmt$(highAcosSpend)}</div></div>
+    </div>`;
+
+  const callout=wastedSpend>0?`
+    <div class="waste-callout">
+      <b>${fmt$(wastedSpend)}</b> (${fmtP(wastedPct)} of total spend) is going to campaigns with
+      ${zeroSales.length>0?`<b>${zeroSales.length} campaigns generating zero sales</b>`:''}
+      ${zeroSales.length>0&&highAcos.length>0?' and ':''}
+      ${highAcos.length>0?`<b>${highAcos.length} campaigns above ${threshold}% ACOS</b>`:''}. 
+      Reallocating this to NB Phrase campaigns would directly improve keyword rank and purchase share.
+    </div>`:'';
+
+  const controls=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="waste-threshold">
+        <span>ACOS threshold:</span>
+        <input type="number" id="acosThreshold" value="${threshold}" min="0" max="999" onchange="renderWasted(window._wastedCampaigns,window._totalSpend)" />
+        <span>%</span>
+      </div>
+      <div class="filter-pills">
+        <button class="filter-pill active" data-wfilter="all" onclick="setWasteFilter(this)">All wasted (${wasted.length})</button>
+        <button class="filter-pill" data-wfilter="zero" onclick="setWasteFilter(this)">Zero sales (${zeroSales.length})</button>
+        <button class="filter-pill" data-wfilter="highacos" onclick="setWasteFilter(this)">High ACOS (${highAcos.length})</button>
+      </div>
+      <select class="sort-select" id="wasteSort" onchange="renderWasteRows(window._wastedSorted)">
+        <option value="spend">Sort: Spend ↓</option>
+        <option value="acos">Sort: ACOS ↓</option>
+      </select>
+    </div>`;
+
+  const tableHead=`
+    <div class="str-tbl-row" style="grid-template-columns:1fr 80px 80px 80px 80px 90px;">
+      <div class="str-head">Campaign</div>
+      <div class="str-head right">Spend</div>
+      <div class="str-head right">Sales</div>
+      <div class="str-head right">Orders</div>
+      <div class="str-head right">ACOS</div>
+      <div class="str-head right">Issue</div>
+    </div>`;
+
+  el.innerHTML=summaryMetrics+callout+controls+`<div class="card"><div id="wasteTableHead">${tableHead}</div><div id="wasteTbody"></div></div>`;
+
+  // Store for filter/sort
+  window._wastedCampaigns=campaigns;
+  window._totalSpend=totalSpend;
+  window._wastedAll=wasted;
+  window._wastedZero=zeroSales;
+  window._wastedHighAcos=highAcos;
+  window._wasteFilter='all';
+  window._wastedSorted=sorted;
+  renderWasteRows(sorted);
+}
+
+function setWasteFilter(btn){
+  document.querySelectorAll('[data-wfilter]').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  window._wasteFilter=btn.dataset.wfilter;
+  const map={all:window._wastedAll,zero:window._wastedZero,highacos:window._wastedHighAcos};
+  const list=map[window._wasteFilter]||window._wastedAll;
+  renderWasteRows([...list].sort((a,b)=>b.spend-a.spend));
+}
+
+function renderWasteRows(list){
+  const tbody=document.getElementById('wasteTbody');
+  if(!tbody)return;
+  const threshold=parseFloat(document.getElementById('acosThreshold')?.value)||100;
+  if(!list.length){tbody.innerHTML=`<div class="empty" style="padding:28px;">No campaigns match this filter.</div>`;return;}
+  tbody.innerHTML=list.map(c=>{
+    const isZero=c.sales===0;
+    const isHigh=c.acos>threshold&&c.sales>0;
+    const issue=isZero?'<span class="badge badge-red">Zero sales</span>':
+                isHigh?`<span class="badge badge-amber">ACOS ${fmtP(c.acos,0)}</span>`:'';
+    const acosColor=c.acos===0?'color:var(--dim)':c.acos>threshold?'color:var(--red)':c.acos>70?'color:var(--amber)':'color:var(--green)';
+    return `<div class="str-tbl-row" style="grid-template-columns:1fr 80px 80px 80px 80px 90px;" data-wissue="${isZero?'zero':isHigh?'highacos':''}">
+      <div class="str-cell td-name collapsed" style="cursor:pointer;font-size:11px;" onclick="this.classList.toggle('collapsed');this.classList.toggle('expanded')">${c.name}</div>
+      <div class="str-cell mono right">${fmt$(c.spend)}</div>
+      <div class="str-cell mono right">${c.sales>0?fmt$(c.sales):'<span style="color:var(--red)">$0</span>'}</div>
+      <div class="str-cell mono right">${c.orders>0?fmtN(c.orders):'<span style="color:var(--red)">0</span>'}</div>
+      <div class="str-cell mono right" style="${acosColor}">${c.acos>0?fmtP(c.acos,1):'—'}</div>
+      <div class="str-cell right">${issue}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SEARCH TERMS & CVR ───────────────────────────────────────────────────────
+function renderSearchTerms(brandName){
+  const el=document.getElementById('tab-searchterms');
+  if(!el)return;
+
+  if(!state.strData){
+    el.innerHTML=`<div class="info-bar"><b>No Search Term Report uploaded.</b> Upload your SP Search Term Report (4th card) to see cluster analysis and CVR opportunities.</div>`;
+    return;
+  }
+
+  const rows=Array.isArray(state.strData)?state.strData:Object.values(state.strData).flat();
+
+  // Parse each STR row
+  const terms=[];
+  rows.forEach(row=>{
+    const term=String(getVal(row,
+      'Customer Search Term','Search Term','customer search term','search term'
+    )||'').toLowerCase().trim();
+    if(!term||term==='customer search term')return;
+    const campName=String(getVal(row,'Campaign Name','campaign name')||'');
+    const impr=parseNum(getVal(row,'Impressions','impressions'));
+    const clicks=parseNum(getVal(row,'Clicks','clicks'));
+    const spend=parseNum(getVal(row,'Spend','spend','Cost','cost'));
+    const sales=parseNum(getVal(row,
+      '7 Day Total Sales ($)','7 Day Total Sales','7 Day Total Sales ','Sales','sales'
+    ));
+    const orders=parseNum(getVal(row,
+      '7 Day Total Orders (#)','7 Day Total Orders','Orders','orders'
+    ));
+    const branded=isBranded(term,brandName)||isBranded(campName,brandName);
+    const cvr=clicks>0?orders/clicks*100:0;
+    const acos=sales>0?spend/sales*100:0;
+    const roas=spend>0?sales/spend:0;
+    terms.push({term,campName,impr,clicks,spend,sales,orders,branded,cvr,acos,roas});
+  });
+
+  if(!terms.length){
+    el.innerHTML=`<div class="empty">No rows parsed from Search Term Report. Check that the file has a "Customer Search Term" column.</div>`;
+    return;
+  }
+
+  // Account-level CVR (NB only, with clicks)
+  const nbTerms=terms.filter(t=>!t.branded&&t.clicks>0);
+  const acctOrders=nbTerms.reduce((s,t)=>s+t.orders,0);
+  const acctClicks=nbTerms.reduce((s,t)=>s+t.clicks,0);
+  const acctCVR=acctClicks>0?acctOrders/acctClicks*100:0;
+
+  // SQP index for brand purchase share
+  const sqpIndex={};
+  if(state.sqpData){
+    const sqpRows=Array.isArray(state.sqpData)?state.sqpData:Object.values(state.sqpData).flat();
+    sqpRows.forEach(row=>{
+      const q=String(getVal(row,'Search Query','search query')||'').toLowerCase().trim();
+      if(!q)return;
+      sqpIndex[q]={
+        vol:parseNum(getVal(row,'Search Query Volume')),
+        bShare:parseNum(getVal(row,'Purchases: Brand Share %')),
+        bPurch:parseNum(getVal(row,'Purchases: Brand Count')),
+        totalPurch:parseNum(getVal(row,'Purchases: Total Count')),
+      };
+    });
+  }
+
+  // Cluster NB terms using KW_TARGETS as seeds
+  // Build cluster map: cluster name -> array of seed keywords
+  const clusterSeeds={};
+  Object.entries(KW_TARGETS).forEach(([pl,data])=>{
+    const seeds=[...(data.t1||[]).map(k=>k.kw.toLowerCase()),...(data.t2||[]).map(k=>k.kw.toLowerCase())];
+    clusterSeeds[pl]=seeds;
+  });
+
+  function getCluster(term){
+    let bestCluster='Other';
+    let bestScore=0;
+    for(const [pl,seeds] of Object.entries(clusterSeeds)){
+      for(const seed of seeds){
+        const seedWords=seed.split(' ');
+        // Score = how many words of the seed appear in the term
+        const matches=seedWords.filter(w=>w.length>2&&term.includes(w)).length;
+        const score=matches/seedWords.length;
+        if(score>bestScore||(score===bestScore&&seed.length>2&&term.includes(seed))){
+          bestScore=score;
+          bestCluster=pl;
+        }
+      }
+      // Direct inclusion check
+      if(seeds.some(s=>term.includes(s)||s.includes(term.split(' ').slice(0,2).join(' '))))
+        bestCluster=pl;
+    }
+    return bestScore>0||bestCluster!=='Other'?bestCluster:'Other';
+  }
+
+  // Assign clusters to NB terms
+  const nbWithCluster=terms.filter(t=>!t.branded&&t.spend>0).map(t=>({
+    ...t,
+    cluster:getCluster(t.term),
+    sqp:sqpIndex[t.term]||null,
+  }));
+
+  // Aggregate by cluster
+  const clusterMap={};
+  nbWithCluster.forEach(t=>{
+    if(!clusterMap[t.cluster])clusterMap[t.cluster]={
+      name:t.cluster,terms:[],spend:0,sales:0,orders:0,clicks:0,impr:0
+    };
+    const c=clusterMap[t.cluster];
+    c.terms.push(t);
+    c.spend+=t.spend;c.sales+=t.sales;c.orders+=t.orders;c.clicks+=t.clicks;c.impr+=t.impr;
+  });
+  // Add metrics
+  Object.values(clusterMap).forEach(c=>{
+    c.roas=c.spend>0?c.sales/c.spend:0;
+    c.acos=c.sales>0?c.spend/c.sales*100:0;
+    c.cvr=c.clicks>0?c.orders/c.clicks*100:0;
+    c.ctr=c.impr>0?c.clicks/c.impr*100:0;
+    c.terms.sort((a,b)=>b.spend-a.spend);
+  });
+
+  // Sort clusters: Other last, rest by spend desc
+  const sortedClusters=Object.values(clusterMap).sort((a,b)=>{
+    if(a.name==='Other')return 1;if(b.name==='Other')return -1;
+    return b.spend-a.spend;
+  });
+
+  // Total NB spend for share calc
+  const totalNBSpend=sortedClusters.reduce((s,c)=>s+c.spend,0);
+
+  // CVR opp count
+  const cvrOpps=nbWithCluster.filter(t=>t.clicks>5&&t.cvr>acctCVR).length;
+
+  // ── Render ──
+  const acctAvgBar=`<div class="str-acct-avg">
+    <span>Account NB CVR baseline: <b>${fmtP(acctCVR,2)}</b></span>
+    <span>NB clicks: <b>${fmtN(acctClicks)}</b></span>
+    <span>NB orders: <b>${fmtN(acctOrders)}</b></span>
+    <span style="color:var(--green)">⚡ <b>${cvrOpps} terms</b> beating account CVR (priority scale candidates)</span>
+  </div>`;
+
+  // Cluster summary cards
+  const clusterCards=sortedClusters.map(c=>{
+    const roasClass=c.roas>=4?'cc-roas-ok':c.roas>=2?'cc-roas-warn':'cc-roas-bad';
+    const highCvrTerms=c.terms.filter(t=>t.clicks>5&&t.cvr>acctCVR).length;
+    const share=totalNBSpend>0?c.spend/totalNBSpend*100:0;
+    return `<div class="cluster-card" onclick="showCluster('${c.name.replace(/'/g,"\\'")}')">
+      <div class="cc-name">${c.name}${highCvrTerms>0?`<span class="cvr-flag">⚡ ${highCvrTerms} CVR opp</span>`:''}</div>
+      <div class="cc-stats">
+        <div class="cc-stat"><span class="cc-stat-label">Spend</span><span class="cc-stat-val">${fmt$(c.spend)}</span></div>
+        <div class="cc-stat"><span class="cc-stat-label">ROAS</span><span class="cc-stat-val ${roasClass}">${c.roas.toFixed(2)}x</span></div>
+        <div class="cc-stat"><span class="cc-stat-label">CVR</span><span class="cc-stat-val">${fmtP(c.cvr,2)}</span></div>
+        <div class="cc-stat"><span class="cc-stat-label">Share of NB</span><span class="cc-stat-val">${fmtP(share,1)}</span></div>
+        <div class="cc-stat"><span class="cc-stat-label">Terms</span><span class="cc-stat-val">${c.terms.length}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Term detail table (default show all, click cluster to filter)
+  function termRows(termList){
+    if(!termList.length)return `<div class="empty" style="padding:24px;">No terms found.</div>`;
+    return termList.map(t=>{
+      const cvrClass=t.clicks<5?'cvr-zero':t.cvr>acctCVR?'cvr-above':'cvr-below';
+      const cvrLabel=t.clicks<5?'< 5 clicks':t.cvr>acctCVR?`▲ ${fmtP(t.cvr,2)}`:`${fmtP(t.cvr,2)}`;
+      const sqpShare=t.sqp?`${fmtP(t.sqp.bShare,1)}%`:'—';
+      const sqpVol=t.sqp?fmtN(t.sqp.vol):'—';
+      return `<div class="str-tbl-row">
+        <div class="str-cell">${t.term}</div>
+        <div class="str-cell mono right">${fmt$(t.spend)}</div>
+        <div class="str-cell mono right">${t.sales>0?fmt$(t.sales):'<span style="color:var(--dim)">$0</span>'}</div>
+        <div class="str-cell mono right">${t.roas>0?t.roas.toFixed(2)+'x':'—'}</div>
+        <div class="str-cell mono right">${fmtN(t.clicks)}</div>
+        <div class="str-cell mono right">${sqpVol}</div>
+        <div class="str-cell mono right">${sqpShare}</div>
+        <div class="str-cell right"><span class="cvr-badge ${cvrClass}">${cvrLabel}</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  const tableHead=`<div class="str-tbl-row">
+    <div class="str-head">Search Term</div>
+    <div class="str-head right">Spend</div>
+    <div class="str-head right">Sales</div>
+    <div class="str-head right">ROAS</div>
+    <div class="str-head right">Clicks</div>
+    <div class="str-head right">SQP Vol</div>
+    <div class="str-head right">B. Share</div>
+    <div class="str-head right">CVR</div>
+  </div>`;
+
+  el.innerHTML=`
+    ${acctAvgBar}
+    <div class="sec-label" style="margin-bottom:10px;">NB Spend by Product Cluster</div>
+    <div class="cluster-grid">${clusterCards}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div class="sec-label" id="termTableLabel" style="margin-bottom:0;">All NB Terms — ${nbWithCluster.length} terms</div>
+      <div class="filter-pills">
+        <button class="filter-pill active" data-stfilter="all" onclick="setSTFilter(this,'all')">All</button>
+        <button class="filter-pill" data-stfilter="cvr" onclick="setSTFilter(this,'cvr')">⚡ CVR Opps</button>
+        <button class="filter-pill" data-stfilter="waste" onclick="setSTFilter(this,'waste')">Zero Sales</button>
+      </div>
+    </div>
+    <div class="card" id="termTableWrap">
+      ${tableHead}
+      <div id="termTbody">${termRows(nbWithCluster)}</div>
+    </div>`;
+
+  // Store for cluster click and filter
+  window._nbTerms=nbWithCluster;
+  window._acctCVR=acctCVR;
+  window._stActiveCluster=null;
+}
+
+function showCluster(name){
+  window._stActiveCluster=name;
+  document.querySelectorAll('.cluster-card').forEach(c=>{
+    c.classList.toggle('active',c.querySelector('.cc-name').textContent.includes(name.slice(0,20)));
+  });
+  document.querySelectorAll('[data-stfilter]').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[data-stfilter="all"]')?.classList.add('active');
+  const label=document.getElementById('termTableLabel');
+  const terms=(window._nbTerms||[]).filter(t=>t.cluster===name);
+  if(label)label.textContent=`${name} — ${terms.length} terms`;
+  const tbody=document.getElementById('termTbody');
+  if(tbody)tbody.innerHTML=renderTermRows(terms);
+}
+
+function setSTFilter(btn, filter){
+  window._stActiveCluster=null;
+  document.querySelectorAll('.cluster-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('[data-stfilter]').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const all=window._nbTerms||[];
+  let list=all;
+  if(filter==='cvr')list=all.filter(t=>t.clicks>5&&t.cvr>window._acctCVR);
+  if(filter==='waste')list=all.filter(t=>t.sales===0&&t.spend>0);
+  const label=document.getElementById('termTableLabel');
+  if(label)label.textContent=`${filter==='all'?'All NB Terms':filter==='cvr'?'CVR Opportunities':'Zero-Sales Terms'} — ${list.length} terms`;
+  const tbody=document.getElementById('termTbody');
+  if(tbody)tbody.innerHTML=renderTermRows(list);
+}
+
+function renderTermRows(termList){
+  const acctCVR=window._acctCVR||0;
+  if(!termList.length)return `<div class="empty" style="padding:24px;">No terms match.</div>`;
+  return termList.map(t=>{
+    const cvrClass=t.clicks<5?'cvr-zero':t.cvr>acctCVR?'cvr-above':'cvr-below';
+    const cvrLabel=t.clicks<5?'< 5 clicks':t.cvr>acctCVR?`▲ ${fmtP(t.cvr,2)}`:`${fmtP(t.cvr,2)}`;
+    const sqpShare=t.sqp?`${fmtP(t.sqp.bShare,1)}%`:'—';
+    const sqpVol=t.sqp?fmtN(t.sqp.vol):'—';
+    return `<div class="str-tbl-row">
+      <div class="str-cell">${t.term}</div>
+      <div class="str-cell mono right">${fmt$(t.spend)}</div>
+      <div class="str-cell mono right">${t.sales>0?fmt$(t.sales):'<span style="color:var(--dim)">$0</span>'}</div>
+      <div class="str-cell mono right">${t.roas>0?t.roas.toFixed(2)+'x':'—'}</div>
+      <div class="str-cell mono right">${fmtN(t.clicks)}</div>
+      <div class="str-cell mono right">${sqpVol}</div>
+      <div class="str-cell mono right">${sqpShare}</div>
+      <div class="str-cell right"><span class="cvr-badge ${cvrClass}">${cvrLabel}</span></div>
+    </div>`;
+  }).join('');
+}
+
+
+// ─── KEYWORD GAPS ────────────────────────────────────────────────────────────
+function renderGaps(){
+  const el=document.getElementById('tab-gaps');
+  if(!el)return;
+
+  if(!Object.keys(KW_TARGETS).length){
+    el.innerHTML=`<div class="info-bar"><b>No keyword targets loaded.</b> Paste ASINs in chat to generate KW_TARGETS first.</div>`;
+    return;
+  }
+
+  // Build STR index: term -> {impr, clicks, spend, orders}
+  const strIndex={};
+  if(state.strData){
+    const rows=Array.isArray(state.strData)?state.strData:Object.values(state.strData).flat();
+    rows.forEach(row=>{
+      const term=String(getVal(row,'Customer Search Term','Search Term','customer search term','search term')||'').toLowerCase().trim();
+      if(!term)return;
+      const impr=parseNum(getVal(row,'Impressions','impressions'));
+      const clicks=parseNum(getVal(row,'Clicks','clicks'));
+      const spend=parseNum(getVal(row,'Spend','spend','Cost','cost'));
+      const orders=parseNum(getVal(row,'7 Day Total Orders (#)','Orders','orders','14 Day Total Orders (#)'));
+      if(!strIndex[term])strIndex[term]={impr:0,clicks:0,spend:0,orders:0};
+      strIndex[term].impr+=impr;
+      strIndex[term].clicks+=clicks;
+      strIndex[term].spend+=spend;
+      strIndex[term].orders+=orders;
+    });
+  }
+
+  // Build SQP index: query -> {vol, bShare}
+  const sqpIndex={};
+  if(state.sqpData){
+    const rows=Array.isArray(state.sqpData)?state.sqpData:Object.values(state.sqpData).flat();
+    rows.forEach(row=>{
+      const term=String(getVal(row,'Search Query','search query')||'').toLowerCase().trim();
+      if(!term)return;
+      sqpIndex[term]={
+        vol:parseNum(getVal(row,'Search Query Volume')),
+        bShare:parseNum(getVal(row,'Purchases: Brand Share %')),
+      };
+    });
+  }
+
+  const hasSTR=Object.keys(strIndex).length>0;
+  const hasSQP=Object.keys(sqpIndex).length>0;
+
+  function getSTRMatch(kw){
+    const kwL=kw.toLowerCase();
+    if(strIndex[kwL])return strIndex[kwL];
+    // Aggregate partial matches (STR terms containing the keyword or vice versa)
+    const keys=Object.keys(strIndex).filter(t=>t.includes(kwL));
+    if(!keys.length)return null;
+    return keys.reduce((acc,k)=>({
+      impr:acc.impr+strIndex[k].impr,
+      clicks:acc.clicks+strIndex[k].clicks,
+      spend:acc.spend+strIndex[k].spend,
+      orders:acc.orders+strIndex[k].orders,
+    }),{impr:0,clicks:0,spend:0,orders:0});
+  }
+
+  function getSQP(kw){return sqpIndex[kw.toLowerCase()]||null;}
+
+  function kwStatus(match){
+    if(!hasSTR)return 'no-str';
+    if(!match||match.impr===0)return 'missing';
+    if(match.orders>0)return 'covered';
+    if(match.clicks>0)return 'low';
+    return 'impr-only';
+  }
+
+  let totalKw=0,totalMissing=0,totalCovered=0;
+
+  const sectionsHtml=Object.entries(KW_TARGETS).map(([pl,data])=>{
+    const allKws=[...(data.t1||[]).map(k=>({...k,tier:'T1'})),...(data.t2||[]).map(k=>({...k,tier:'T2'}))];
+    totalKw+=allKws.length;
+
+    const enriched=allKws.map(k=>{
+      const match=hasSTR?getSTRMatch(k.kw):null;
+      const sqp=getSQP(k.kw);
+      const status=kwStatus(match);
+      return {...k,match,sqp,status};
+    });
+
+    const plMissing=enriched.filter(k=>k.status==='missing').length;
+    const plCovered=enriched.filter(k=>k.status==='covered'||k.status==='low'||k.status==='impr-only').length;
+    totalMissing+=plMissing;
+    totalCovered+=plCovered;
+
+    const rowsHtml=enriched.map(k=>{
+      let statusBadge='';
+      if(k.status==='missing') statusBadge='<span class="gap-status gs-miss">⛔ Missing</span>';
+      else if(k.status==='covered') statusBadge='<span class="gap-status gs-ok">✓ Active</span>';
+      else if(k.status==='low') statusBadge='<span class="gap-status gs-low">⚠ Low</span>';
+      else if(k.status==='impr-only') statusBadge='<span class="gap-status gs-low">👁 Impr only</span>';
+      else statusBadge='<span class="gap-status" style="background:var(--s3);color:var(--dim)">— No STR</span>';
+
+      const tierBadge=k.tier==='T1'
+        ?'<span class="badge badge-blue" style="font-size:9px;padding:1px 6px;">T1</span>'
+        :'<span class="badge badge-green" style="font-size:9px;padding:1px 6px;">T2</span>';
+
+      const sqpVol=k.sqp?fmtN(k.sqp.vol):(k.vol?fmtN(k.vol):'—');
+      const sqpShare=k.sqp?fmtP(k.sqp.bShare,2):'—';
+      const imprCell=k.match?fmtN(k.match.impr):'—';
+      const clicksCell=k.match?fmtN(k.match.clicks):'—';
+      const ordersCell=k.match?fmtN(k.match.orders):'—';
+
+      return `<div class="gap-row">
+        <div class="gap-cell">${tierBadge}<span style="margin-left:6px;">${k.kw}</span></div>
+        <div class="gap-cell right">${statusBadge}</div>
+        <div class="gap-cell right mono">${sqpVol}</div>
+        <div class="gap-cell right mono">${sqpShare}</div>
+        <div class="gap-cell right mono">${imprCell}</div>
+        <div class="gap-cell right mono">${clicksCell}</div>
+        <div class="gap-cell right mono">${ordersCell}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="gap-pl-section" data-pl="${pl}">
+      <div class="gap-pl-head">
+        <div class="gap-pl-title">${pl}</div>
+        <div class="gap-pl-stats">
+          ${hasSTR?`<span class="gap-stat gs-covered">✓ ${plCovered} active</span><span class="gap-stat gs-gap">⛔ ${plMissing} missing</span>`:''}
+          <span class="gap-stat" style="background:var(--s3);color:var(--sub);">${allKws.length} targets</span>
+        </div>
+      </div>
+      <div class="gap-table-wrap">
+        <div class="gap-row">
+          <div class="gap-head">Keyword</div>
+          <div class="gap-head right">Status</div>
+          <div class="gap-head right">SQP Vol</div>
+          <div class="gap-head right">B. Share</div>
+          <div class="gap-head right">Impr</div>
+          <div class="gap-head right">Clicks</div>
+          <div class="gap-head right">Orders</div>
+        </div>
+        ${rowsHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  const summaryBar=`<div class="info-bar" style="margin-bottom:20px;">
+    <b>${totalKw} keyword targets</b> across ${Object.keys(KW_TARGETS).length} product lines.&nbsp;
+    ${hasSTR
+      ?`<b style="color:var(--green)">${totalCovered} active</b> in your Search Term Report &nbsp;·&nbsp; <b style="color:var(--red)">${totalMissing} missing</b> — no impressions found in STR.`
+      :`<b>Upload your SP Search Term Report</b> above to see coverage vs. gaps.`}
+    &nbsp;${hasSQP?'SQP volume and brand share from your Brand View upload.':'Upload SQP for brand share context.'}
+  </div>`;
+
+  const filterBar=`<div class="gap-filter-bar">
+    <input type="text" placeholder="Filter keywords…" oninput="filterGapRows(this.value)" />
+    <div class="filter-pills">
+      <button class="filter-pill active" data-gfilter="all" onclick="setGapFilter(this)">All</button>
+      ${hasSTR?`<button class="filter-pill" data-gfilter="missing" onclick="setGapFilter(this)">Missing only</button>
+      <button class="filter-pill" data-gfilter="covered" onclick="setGapFilter(this)">Active only</button>`:''}
+      <button class="filter-pill" data-gfilter="t1" onclick="setGapFilter(this)">Tier 1</button>
+      <button class="filter-pill" data-gfilter="t2" onclick="setGapFilter(this)">Tier 2</button>
+    </div>
+  </div>`;
+
+  el.innerHTML=summaryBar+filterBar+`<div id="gapSections">`+sectionsHtml+`</div>`;
+}
+
+function setGapFilter(btn){
+  document.querySelectorAll('[data-gfilter]').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  window._gapFilter=btn.dataset.gfilter||'all';
+  applyGapFilters();
+}
+
+function filterGapRows(q){
+  window._gapSearch=(q||'').toLowerCase();
+  applyGapFilters();
+}
+
+function applyGapFilters(){
+  const q=window._gapSearch||'';
+  const f=window._gapFilter||'all';
+  document.querySelectorAll('.gap-pl-section').forEach(section=>{
+    let anyVisible=false;
+    section.querySelectorAll('.gap-row:not(.gap-row:first-child)').forEach(row=>{
+      const kwEl=row.querySelector('.gap-cell:first-child');
+      if(!kwEl||row.querySelector('.gap-head'))return;
+      const kw=kwEl.textContent.toLowerCase();
+      const statusEl=row.querySelector('.gap-status');
+      const statusText=statusEl?statusEl.textContent.toLowerCase():'';
+      const isMissing=statusText.includes('missing');
+      const isCovered=!isMissing&&statusEl!==null&&!statusText.includes('no str');
+      const isT1=kwEl.querySelector('.badge-blue')!==null;
+      const isT2=kwEl.querySelector('.badge-green')!==null;
+
+      let show=true;
+      if(q&&!kw.includes(q))show=false;
+      if(f==='missing'&&!isMissing)show=false;
+      if(f==='covered'&&!isCovered)show=false;
+      if(f==='t1'&&!isT1)show=false;
+      if(f==='t2'&&!isT2)show=false;
+
+      row.style.display=show?'':'none';
+      if(show)anyVisible=true;
+    });
+    section.style.display=anyVisible?'':'none';
+  });
+}
+
+
 function renderCompetitors(){
   const el=document.getElementById('tab-competitors');
+
+  if(!Object.keys(COMPETITORS).length){
+    el.innerHTML=`<div class="info-bar"><b>No competitor data yet.</b> Paste your ASINs in chat with Claude — Claude will return a <code>COMPETITORS</code> block to drop into the HTML.</div><div class="empty">Competitors will appear here once populated.</div>`;
+    return;
+  }
   const cards=Object.entries(COMPETITORS).map(([pl,{brands,note}])=>`
     <div class="card">
       <div class="card-head"><div class="card-head-title">${pl}</div><span style="font-size:11px;color:var(--dim)">${brands.length} brands</span></div>
@@ -681,18 +1691,18 @@ function renderPlan(violations,bPct,nbPct,autoPct){
       {p:1,text:'Switch Fixed Bid campaigns → Dynamic bids – down only',impact:'ACOS protection'},
       {p:1,text:'Switch up-and-down bid campaigns → Dynamic bids – down only',impact:'Stop overbidding'},
       {p:1,text:`Cap branded budgets to ≤20% of total daily spend (currently ${fmtP(bPct)})`,impact:'Frees budget for NB'},
-      {p:1,text:'Activate or confirm dedicated Auto per product line: Trash Bags, Zip Bags, Dog Poop Bags',impact:'Restores harvesting pipeline'},
-      {p:1,text:'Activate NB Phrase campaigns for top terms: trash bags, sandwich bags, dog poop bags rolls',impact:'Impression share on core terms'},
+      {p:1,text:'Activate or confirm one dedicated Auto campaign per product line',impact:'Restores harvesting pipeline'},
+      {p:1,text:'Activate NB Phrase campaigns for top volume terms per product line',impact:'Impression share on core terms'},
       {p:2,text:'Add brand Phrase negatives to all NB campaigns',impact:'Clean branded/NB budget split'},
       {p:2,text:'Review paused NB campaigns — identify activate / rebuild / retire per product line',impact:'Activation roadmap'},
     ]},
     {n:'02',title:'Scale',range:'Days 31–60',items:[
       {p:1,text:'Harvest Auto winners → promote to NB Exact campaigns',impact:'Lower CPC on proven terms'},
       {p:1,text:'Launch ranking campaigns for top 3 NB terms per product line',impact:'Organic rank lift'},
-      {p:2,text:'Build competitor KW campaigns targeting brand name terms: Glad, Hefty, Earth Rated, BioBag',impact:'Intercept competitor demand'},
+      {p:2,text:'Build competitor KW campaigns targeting top competitor brand name terms',impact:'Intercept competitor demand'},
       {p:2,text:'Activate SP CAT competitor PAT campaigns with ASINs from Helium 10',impact:'Product page conquest'},
-      {p:2,text:'Refresh Zip Bags PAT — competitor ASIN list likely stale',impact:'Restore PAT conversion flow'},
-      {p:3,text:'Launch NB Sponsored Brand Video for Trash Bags and Dog Poop lines',impact:'Upper-funnel awareness'},
+      {p:2,text:'Audit PAT campaigns — refresh competitor ASIN lists if stale',impact:'Restore PAT conversion flow'},
+      {p:3,text:'Launch NB Sponsored Brand Video for top product lines',impact:'Upper-funnel awareness'},
       {p:3,text:'Milestone check: Branded ≤40%, NB ≥60%',impact:'Midpoint rebalance check'},
     ]},
     {n:'03',title:'Systemize',range:'Days 61–90',items:[
